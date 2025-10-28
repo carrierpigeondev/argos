@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>podman-volume-create 1</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<h2 id="name">NAME</h2>
+<p>podman-volume-create - Create a new volume</p>
+<h2 id="synopsis">SYNOPSIS</h2>
+<p><strong>podman volume create</strong> [<em>options</em>]
+[<em>name</em>]</p>
+<h2 id="description">DESCRIPTION</h2>
+<p>Creates an empty volume and prepares it to be used by containers. The
+volume can be created with a specific name, if a name is not given a
+random name is generated. You can add metadata to the volume by using
+the <strong>--label</strong> flag and driver options can be set using
+the <strong>--opt</strong> flag.</p>
+<h2 id="options">OPTIONS</h2>
+<h4 id="driver--ddriver"><strong>--driver</strong>,
+<strong>-d</strong>=<em>driver</em></h4>
+<p>Specify the volume driver name (default <strong>local</strong>).
+There are two drivers supported by Podman itself: <strong>local</strong>
+and <strong>image</strong>.</p>
+<p>The <strong>local</strong> driver uses a directory on disk as the
+backend by default, but can also use the <strong>mount(8)</strong>
+command to mount a filesystem as the volume if <strong>--opt</strong> is
+specified.</p>
+<p>The <strong>image</strong> driver uses an image as the backing store
+of for the volume. An overlay filesystem is created, which allows
+changes to the volume to be committed as a new layer on top of the
+image.</p>
+<p>Using a value other than <strong>local</strong> or
+<strong>image</strong>, Podman attempts to create the volume using a
+volume plugin with the given name. Such plugins must be defined in the
+<strong>volume_plugins</strong> section of the <strong><a
+href="https://github.com/containers/common/blob/main/docs/containers.conf.5.md">containers.conf(5)</a></strong>
+configuration file.</p>
+<h4 id="gidgid"><strong>--gid</strong>=<em>gid</em></h4>
+<p>Set the GID that the volume will be created as. Differently than
+<code>--opt o=gid=*gid*</code>, the specified value is not passed to the
+mount operation. The specified GID will own the volume's mount point
+directory and affects the volume chown operation.</p>
+<h4 id="help"><strong>--help</strong></h4>
+<p>Print usage statement</p>
+<h4 id="ignore"><strong>--ignore</strong></h4>
+<p>Don't fail if the named volume already exists, instead just print the
+name. Note that the new options are not applied to the existing
+volume.</p>
+<h4 id="label--llabel"><strong>--label</strong>,
+<strong>-l</strong>=<em>label</em></h4>
+<p>Set metadata for a volume (e.g., --label mykey=value).</p>
+<h4 id="opt--ooption"><strong>--opt</strong>,
+<strong>-o</strong>=<em>option</em></h4>
+<p>Set driver specific options. For the default driver,
+<strong>local</strong>, this allows a volume to be configured to mount a
+filesystem on the host.</p>
+<p>For the <code>local</code> driver the following options are
+supported: <code>type</code>, <code>device</code>, <code>o</code>, and
+<code>[no]copy</code>.</p>
+<ul>
+<li>The <code>type</code> option sets the type of the filesystem to be
+mounted, and is equivalent to the <code>-t</code> flag to
+<strong>mount(8)</strong>.</li>
+<li>The <code>device</code> option sets the device to be mounted, and is
+equivalent to the <code>device</code> argument to
+<strong>mount(8)</strong>.</li>
+<li>The <code>copy</code> option enables copying files from the
+container image path where the mount is created to the newly created
+volume on the first run. <code>copy</code> is the default.</li>
+</ul>
+<p>The <code>o</code> option sets options for the mount, and is
+equivalent to the filesystem options (also <code>-o</code>) passed to
+<strong>mount(8)</strong> with the following exceptions:</p>
+<ul>
+<li>The <code>o</code> option supports <code>uid</code> and
+<code>gid</code> options to set the UID and GID of the created volume
+that are not normally supported by <strong>mount(8)</strong>.</li>
+<li>The <code>o</code> option supports the <code>size</code> option to
+set the maximum size of the created volume, the <code>inodes</code>
+option to set the maximum number of inodes for the volume, and
+<code>noquota</code> to completely disable quota support even for
+tracking of disk usage. The <code>size</code> option is supported on the
+"tmpfs" and "xfs[note]" file systems. The <code>inodes</code> option is
+supported on the "xfs[note]" file systems. Note: xfs filesystems must be
+mounted with the <code>prjquota</code> flag described in the
+<strong>xfs_quota(8)</strong> man page. Podman will throw an error if
+they're not.</li>
+<li>The <code>o</code> option supports using volume options other than
+the UID/GID options with the <strong>local</strong> driver and requires
+root privileges.</li>
+<li>The <code>o</code> options supports the <code>timeout</code> option
+which allows users to set a driver specific timeout in seconds before
+volume creation fails. For example, <strong>--opt=o=timeout=10</strong>
+sets a driver timeout of 10 seconds.</li>
+</ul>
+<p><strong><em>Note</em></strong> Do not confuse the
+<code>--opt,-o</code> create option with the <code>-o</code> mount
+option. For example, with <code>podman volume create</code>, use
+<code>-o=o=uid=1000</code> <em>not</em> <code>-o=uid=1000</code>.</p>
+<p>For the <strong>image</strong> driver, the only supported option is
+<code>image</code>, which specifies the image the volume is based on.
+This option is mandatory when using the <strong>image</strong>
+driver.</p>
+<p>When not using the <strong>local</strong> and <strong>image</strong>
+drivers, the given options are passed directly to the volume plugin. In
+this case, supported options are dictated by the plugin in question, not
+Podman.</p>
+<h4 id="uiduid"><strong>--uid</strong>=<em>uid</em></h4>
+<p>Set the UID that the volume will be created as. Differently than
+<code>--opt o=uid=*uid*</code>, the specified value is not passed to the
+mount operation. The specified UID will own the volume's mount point
+directory and affects the volume chown operation.</p>
+<h2 id="quotas">QUOTAS</h2>
+<p><code>podman volume create</code> uses
+<code>XFS project quota controls</code> for controlling the size and the
+number of inodes of builtin volumes. The directory used to store the
+volumes must be an <code>XFS</code> file system and be mounted with the
+<code>pquota</code> option.</p>
+<p>Example /etc/fstab entry:</p>
+<pre><code>/dev/podman/podman-var /var xfs defaults,x-systemd.device-timeout=0,pquota 1 2</code></pre>
+<p>Podman generates project IDs for each builtin volume, but these
+project IDs need to be unique for the XFS file system. These project IDs
+by default are generated randomly, with a potential for overlap with
+other quotas on the same file system.</p>
+<p>The xfs_quota tool can be used to assign a project ID to the storage
+driver directory, e.g.:</p>
+<pre><code>echo 100000:/var/lib/containers/storage/overlay &gt;&gt; /etc/projects
+echo 200000:/var/lib/containers/storage/volumes &gt;&gt; /etc/projects
+echo storage:100000 &gt;&gt; /etc/projid
+echo volumes:200000 &gt;&gt; /etc/projid
+xfs_quota -x -c &#39;project -s storage volumes&#39; /&lt;xfs mount point&gt;</code></pre>
+<p>In the example above we are configuring the overlay storage driver
+for newly created containers as well as volumes to use project IDs with
+a <strong>start offset</strong>. All containers are assigned larger
+project IDs (e.g. &gt;= 100000). All volume assigned project IDs larger
+project IDs starting with 200000. This prevents xfs_quota management
+conflicts with containers/storage.</p>
+<h2 id="examples">EXAMPLES</h2>
+<p>Create empty volume.</p>
+<pre><code>$ podman volume create</code></pre>
+<p>Create empty named volume.</p>
+<pre><code>$ podman volume create myvol</code></pre>
+<p>Create empty named volume with specified label.</p>
+<pre><code>$ podman volume create --label foo=bar myvol</code></pre>
+<p>Create tmpfs named volume with specified size and mount options.</p>
+<pre><code># podman volume create --opt device=tmpfs --opt type=tmpfs --opt o=size=2M,nodev,noexec myvol</code></pre>
+<p>Create tmpfs named volume testvol with specified options.</p>
+<pre><code># podman volume create --opt device=tmpfs --opt type=tmpfs --opt o=uid=1000,gid=1000 testvol</code></pre>
+<p>Create volume overriding the owner UID and GID.</p>
+<pre><code># podman volume create --uid 1000 --gid 1000 myvol</code></pre>
+<p>Create image named volume using the specified local image in
+containers/storage.</p>
+<pre><code># podman volume create --driver image --opt image=fedora:latest fedoraVol</code></pre>
+<h2 id="mount-examples">MOUNT EXAMPLES</h2>
+<p><code>podman volume create</code> allows the <code>type</code>,
+<code>device</code>, and <code>o</code> options to be passed to
+<code>mount(8)</code> when using the <code>local</code> driver.</p>
+<h2 id="s3fs-fuse"><a
+href="https://github.com/s3fs-fuse/s3fs-fuse">s3fs-fuse</a></h2>
+<p><a href="https://github.com/s3fs-fuse/s3fs-fuse">s3fs-fuse</a> or
+just <code>s3fs</code>, is a <a
+href="https://github.com/libfuse/libfuse">fuse</a> filesystem that
+allows s3 prefixes to be mounted as filesystem mounts.</p>
+<p><strong>Installing:</strong></p>
+<pre class="shell"><code>$ doas dnf install s3fs-fuse</code></pre>
+<p><strong>Simple usage:</strong></p>
+<pre class="shell"><code>$ s3fs --help
+$ s3fs -o use_xattr,endpoint=aq-central-1 bucket:/prefix /mnt</code></pre>
+<p><strong>Equivalent through <code>mount(8)</code></strong></p>
+<pre class="shell"><code>$ mount -t fuse.s3fs -o use_xattr,endpoint=aq-central-1 bucket:/prefix /mnt</code></pre>
+<p><strong>Equivalent through
+<code>podman volume create</code></strong></p>
+<pre class="shell"><code>$ podman volume create s3fs-fuse-volume -o type=fuse.s3fs -o device=bucket:/prefix -o o=use_xattr,endpoint=aq-central-1</code></pre>
+<p><strong>The volume can then be mounted in a container
+with</strong></p>
+<pre class="shell"><code>$ podman run -v s3fs-fuse-volume:/s3:z --rm -it fedora:latest</code></pre>
+<p>Please see the available <a
+href="https://github.com/s3fs-fuse/s3fs-fuse/wiki/Fuse-Over-Amazon#options">options</a>
+on their wiki.</p>
+<h3 id="using-with-other-container-users">Using with other container
+users</h3>
+<p>The above example works because the volume is mounted as the host
+user and inside the container <code>root</code> is mapped to the user in
+the host.</p>
+<p>If the mount is accessed by a different user inside the container, a
+"Permission denied" error will be raised.</p>
+<pre class="shell"><code>$ podman run --user bin:bin -v s3fs-fuse-volume:/s3:z,U --rm -it fedora:latest
+$ ls /s3
+# ls: /s3: Permission denied</code></pre>
+<p>In FUSE-land, mounts are protected for the user who mounted them;
+specify the <code>allow_other</code> mount option if other users need
+access. &gt; Note: This will remove the normal fuse <a
+href="https://github.com/libfuse/libfuse/wiki/FAQ#why-dont-other-users-have-access-to-the-mounted-filesystem">security
+measures</a> on the mount point, after which, the normal filesystem
+permissions will have to protect it</p>
+<pre class="shell"><code>$ podman volume create s3fs-fuse-other-volume -o type=fuse.s3fs -o device=bucket:/prefix -o o=allow_other,use_xattr,endpoint=aq-central-1
+$ podman run --user bin:bin -v s3fs-fuse-volume:/s3:z,U --rm -it fedora:latest
+$ ls /s3</code></pre>
+<h3 id="the-prefix-must-exist">The Prefix must exist</h3>
+<p><code>s3fs</code> will fail to mount if the prefix does not exist in
+the bucket.</p>
+<p>Create a s3-directory by putting an empty object at the desired
+<code>prefix/</code> key</p>
+<pre class="shell"><code>$ aws s3api put-object --bucket bucket --key prefix/</code></pre>
+<p>If performance is the priority, please check out the more performant
+<a href="https://github.com/kahing/goofys">goofys</a>.</p>
+<blockquote>
+<p>FUSE filesystems exist for <a
+href="https://github.com/GoogleCloudPlatform/gcsfuse">Google Cloud
+Storage</a> and <a
+href="https://github.com/Azure/azure-storage-fuse">Azure Blob
+Storage</a></p>
+</blockquote>
+<h2 id="see-also">SEE ALSO</h2>
+<p><strong><a href="podman.html">podman(1)</a></strong>, <strong><a
+href="https://github.com/containers/common/blob/main/docs/containers.conf.5.md">containers.conf(5)</a></strong>,
+<strong><a href="podman-volume.html">podman-volume(1)</a></strong>,
+<strong>mount(8)</strong>, <strong>xfs_quota(8)</strong>,
+<strong>xfs_quota(8)</strong>, <strong>projects(5)</strong>,
+<strong>projid(5)</strong></p>
+<h2 id="history">HISTORY</h2>
+<p>January 2020, updated with information on volume plugins by Matthew
+Heon <a href="mailto:mheon@redhat.com"
+class="email">mheon@redhat.com</a> November 2018, Originally compiled by
+Urvashi Mohnani <a href="mailto:umohnani@redhat.com"
+class="email">umohnani@redhat.com</a></p>
+</body>
+</html>

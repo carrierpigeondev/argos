@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>podman-kube-play 1</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<h2 id="name">NAME</h2>
+<p>podman-kube-play - Create containers, pods and volumes based on
+Kubernetes YAML</p>
+<h2 id="synopsis">SYNOPSIS</h2>
+<p><strong>podman kube play</strong> [<em>options</em>]
+<em>file.yml|-|https://website.io/file.yml</em></p>
+<h2 id="description">DESCRIPTION</h2>
+<p><strong>podman kube play</strong> reads in a structured file of
+Kubernetes YAML. It recreates the containers, pods, or volumes described
+in the YAML. Containers within a pod are then started, and the ID of the
+new Pod or the name of the new Volume is output. If the YAML file is
+specified as "-", then <code>podman kube play</code> reads the YAML file
+from stdin. The input can also be a URL that points to a YAML file such
+as https://podman.io/demo.yml. <code>podman kube play</code> reads the
+YAML from the URL and create pods and containers from it.</p>
+<p>Using the <code>--down</code> command line option, it is also capable
+of tearing down the pods created by a previous run of
+<code>podman kube play</code>.</p>
+<p>Using the <code>--replace</code> command line option, it tears down
+the pods(if any) created by a previous run of
+<code>podman kube play</code> and recreate the pods with the Kubernetes
+YAML file.</p>
+<p>Ideally the input file is created by the Podman command (see
+podman-kube-generate(1)). This guarantees a smooth import and expected
+results.</p>
+<p>Currently, the supported Kubernetes kinds are:</p>
+<ul>
+<li>Pod</li>
+<li>Deployment</li>
+<li>PersistentVolumeClaim</li>
+<li>ConfigMap</li>
+<li>Secret</li>
+<li>DaemonSet</li>
+<li>Job</li>
+</ul>
+<p><code>Kubernetes Pods or Deployments</code></p>
+<p>Only five volume types are supported by kube play, the
+<em>hostPath</em>, <em>emptyDir</em>, <em>configMap</em>,
+<em>persistentVolumeClaim</em>, and <em>image</em> volume types.</p>
+<ul>
+<li>When using the <em>hostPath</em> volume type, only the <em>default
+(empty)</em>, <em>DirectoryOrCreate</em>, <em>Directory</em>,
+<em>FileOrCreate</em>, <em>File</em>, <em>Socket</em>,
+<em>CharDevice</em> and <em>BlockDevice</em> subtypes are supported.
+Podman interprets the value of <em>hostPath</em> <em>path</em> as a file
+path when it contains at least one forward slash, otherwise Podman
+treats the value as the name of a named volume.</li>
+<li>When using a <em>persistentVolumeClaim</em>, the value for
+<em>claimName</em> is the name for the Podman named volume.</li>
+<li>When using an <em>emptyDir</em> volume, Podman creates an anonymous
+volume that is attached the containers running inside the pod and is
+deleted once the pod is removed.</li>
+<li>When using an <em>configMap</em> volume, Podman creates an anonymous
+volume that is attached the containers running inside the pod and is
+deleted once the pod is removed.</li>
+<li>When using an <em>image</em> volume, Podman creates a read-only
+image volume with an empty subpath (the whole image is mounted). The
+image must already exist locally. It is supported in rootful mode
+only.</li>
+</ul>
+<p>Note: The default restart policy for containers is
+<code>always</code>. You can change the default by setting the
+<code>restartPolicy</code> field in the spec.</p>
+<p>Note: When playing a kube YAML with init containers, the init
+container is created with init type value <code>once</code>. To change
+the default type, use the
+<code>io.podman.annotations.init.container.type</code> annotation to set
+the type to <code>always</code>.</p>
+<p>Note: <em>hostPath</em> volume types created by kube play is given an
+SELinux shared label (z), bind mounts are not relabeled (use
+<code>chcon -t container_file_t -R &lt;directory&gt;</code>).</p>
+<p>Note: To set userns of a pod, use the
+<strong>io.podman.annotations.userns</strong> annotation in the
+pod/deployment definition. For example,
+<strong>io.podman.annotations.userns=keep-id</strong> annotation tells
+Podman to create a user namespace where the current rootless user's
+UID:GID are mapped to the same values in the container. This can be
+overridden with the <code>--userns</code> flag.</p>
+<p>Note: Use the <strong>io.podman.annotations.volumes-from</strong>
+annotation to bind mount volumes of one container to another. You can
+mount volumes from multiple source containers to a target container. The
+source containers that belong to the same pod must be defined before the
+source container in the kube YAML. The annotation format is
+<code>io.podman.annotations.volumes-from/targetContainer: "sourceContainer1:mountOpts1;sourceContainer2:mountOpts2"</code>.</p>
+<p>Note: If the <code>:latest</code> tag is used, Podman attempts to
+pull the image from a registry. If the image was built locally with
+Podman or Buildah, it has <code>localhost</code> as the domain, in that
+case, Podman uses the image from the local store even if it has the
+<code>:latest</code> tag.</p>
+<p>Note: The command <code>podman play kube</code> is an alias of
+<code>podman kube play</code>, and performs the same function.</p>
+<p>Note: The command <code>podman kube down</code> can be used to stop
+and remove pods or containers based on the same Kubernetes YAML used by
+<code>podman kube play</code> to create them.</p>
+<p>Note: To customize the name of the infra container created during
+<code>podman kube play</code>, use the
+<strong>io.podman.annotations.infra.name</strong> annotation in the pod
+definition. This annotation is automatically set when generating a kube
+yaml from a pod that was created with the <code>--infra-name</code> flag
+set.</p>
+<p>Note: Use the
+<strong>io.podman.annotations.pids-limit/$ctrname</strong> annotation to
+configure the pod's pids limit.</p>
+<p>Note: Use the <strong>io.podman.annotations.cpuset/$ctrname</strong>
+annotation to restrict a container's execution to a specific set of CPU
+cores. This is equivalent to the <code>--cpuset-cpus=number</code>
+option in podman-run(1).</p>
+<p>Note: Use the
+<strong>io.podman.annotations.memory-nodes/$ctrname</strong> annotation
+to restrict a container's memory allocations to a specific set of memory
+nodes on NUMA systems. This is equivalent to the
+<code>--cpuset-mems=nodes</code> option in podman-run(1).</p>
+<p><code>Kubernetes PersistentVolumeClaims</code></p>
+<p>A Kubernetes PersistentVolumeClaim represents a Podman named volume.
+Only the PersistentVolumeClaim name is required by Podman to create a
+volume. Kubernetes annotations can be used to make use of the available
+options for Podman volumes.</p>
+<ul>
+<li>volume.podman.io/driver</li>
+<li>volume.podman.io/device</li>
+<li>volume.podman.io/type</li>
+<li>volume.podman.io/uid</li>
+<li>volume.podman.io/gid</li>
+<li>volume.podman.io/mount-options</li>
+<li>volume.podman.io/import-source</li>
+<li>volume.podman.io/image</li>
+</ul>
+<p>Use <code>volume.podman.io/import-source</code> to import the
+contents of the tarball (.tar, .tar.gz, .tgz, .bzip, .tar.xz, .txz)
+specified in the annotation's value into the created Podman volume</p>
+<p>Kube play is capable of building images on the fly given the correct
+directory layout and Containerfiles. This option is not available for
+remote clients, including Mac and Windows (excluding WSL2) machines,
+yet. Consider the following excerpt from a YAML file:</p>
+<pre><code>apiVersion: v1
+kind: Pod
+metadata:
+...
+spec:
+  containers:
+  - name: container
+    image: foobar
+...</code></pre>
+<p>If there is a directory named <code>foobar</code> in the current
+working directory with a file named <code>Containerfile</code> or
+<code>Dockerfile</code>, Podman kube play builds that image and name it
+<code>foobar</code>. An example directory structure for this example
+looks like:</p>
+<pre><code>|- mykubefiles
+    |- myplayfile.yaml
+    |- foobar
+         |- Containerfile</code></pre>
+<p>The build considers <code>foobar</code> to be the context directory
+for the build. If there is an image in local storage called
+<code>foobar</code>, the image is not built unless the
+<code>--build</code> flag is used. Use <code>--build=false</code> to
+completely disable builds.</p>
+<p>Kube play supports CDI (Container Device Interface) device selectors
+to share host devices (e.g. GPUs) with containers. The configuration
+format follows Kubernetes extended resource management:</p>
+<pre><code>apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: container
+    resources:
+      limits:
+        nvidia.com/gpu=all: 1</code></pre>
+<p>To enable sharing host devices, analogous to using the
+<code>--device</code> flag Podman kube supports a custom CDI selector:
+<code>podman.io/device=&lt;host device path&gt;</code>.</p>
+<p><code>Kubernetes ConfigMap</code></p>
+<p>Kubernetes ConfigMap can be referred as a source of environment
+variables or volumes in Pods or Deployments. ConfigMaps aren't a
+standalone object in Podman; instead, when a container uses a ConfigMap,
+Podman creates environment variables or volumes as needed.</p>
+<p>For example, the following YAML document defines a ConfigMap and then
+uses it in a Pod:</p>
+<pre><code>apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: foo
+data:
+    FOO: bar
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: foobar
+spec:
+  containers:
+  - name: container-1
+    image: foobar
+    envFrom:
+    - configMapRef:
+        name: foo
+        optional: false</code></pre>
+<p>and as a result environment variable <code>FOO</code> is set to
+<code>bar</code> for container <code>container-1</code>.</p>
+<p><code>Kubernetes Secret</code></p>
+<p>Kubernetes Secret represents a Podman named secret. The Kubernetes
+Secret is saved as a whole and may be referred to as a source of
+environment variables or volumes in Pods or Deployments.</p>
+<p>For example, the following YAML document defines a Secret and then
+uses it in a Pod:</p>
+<pre><code>kind: Secret
+apiVersion: v1
+metadata:
+  name: foo
+data:
+  foo: YmFy # base64 for bar
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: foobar
+spec:
+  containers:
+  - name: container-1
+    image: foobar
+    env:
+    - name: FOO
+      valueFrom:
+        secretKeyRef:
+          name: foo
+          key: foo</code></pre>
+<p>and as a result environment variable <code>FOO</code> is set to
+<code>bar</code> for container <code>container-1</code>.</p>
+<p><code>Automounting Volumes (deprecated)</code></p>
+<p>Note: The automounting annotation is deprecated. Kubernetes has <a
+href="https://kubernetes.io/docs/tasks/configure-pod-container/image-volumes/">native
+support for image volumes</a> and that should be used rather than this
+podman-specific annotation.</p>
+<p>An image can be automatically mounted into a container if the
+annotation
+<code>io.podman.annotations.kube.image.automount/$ctrname</code> is
+given. The following rules apply:</p>
+<ul>
+<li>The image must already exist locally.</li>
+<li>The image must have at least 1 volume directive.</li>
+<li>The path given by the volume directive will be mounted from the
+image into the container. For example, an image with a volume at
+<code>/test/test_dir</code> will have <code>/test/test_dir</code> in the
+image mounted to <code>/test/test_dir</code> in the container.</li>
+<li>Multiple images can be specified. If multiple images have a volume
+at a specific path, the last image specified trumps.</li>
+<li>The images are always mounted read-only.</li>
+<li>Images to mount are defined in the annotation
+"io.podman.annotations.kube.image.automount/$ctrname" as a
+semicolon-separated list. They are mounted into a single container in
+the pod, not the whole pod. The annotation can be specified for
+additional containers if additional mounts are required.</li>
+</ul>
+<h2 id="options">OPTIONS</h2>
+<h4
+id="annotationkeyvalue"><strong>--annotation</strong>=<em>key=value</em></h4>
+<p>Add an annotation to the container or pod. This option can be set
+multiple times.</p>
+<h4 id="authfilepath"><strong>--authfile</strong>=<em>path</em></h4>
+<p>Path of the authentication file. Default is
+<code>${XDG_RUNTIME_DIR}/containers/auth.json</code> on Linux, and
+<code>$HOME/.config/containers/auth.json</code> on Windows/macOS. The
+file is created by <strong><a href="podman-login.html">podman
+login</a></strong>. If the authorization state is not found there,
+<code>$HOME/.docker/config.json</code> is checked, which is set using
+<strong>docker login</strong>.</p>
+<p>Note: There is also the option to override the default path of the
+authentication file by setting the <code>REGISTRY_AUTH_FILE</code>
+environment variable. This can be done with <strong>export
+REGISTRY_AUTH_FILE=<em>path</em></strong>.</p>
+<h4 id="build"><strong>--build</strong></h4>
+<p>Build images even if they are found in the local storage. Use
+<code>--build=false</code> to completely disable builds. (This option is
+not available with the remote Podman client)</p>
+<p>Note: You can also override the default isolation type by setting the
+BUILDAH_ISOLATION environment variable. export BUILDAH_ISOLATION=oci.
+See podman-build.1.md for more information.</p>
+<h4 id="cert-dirpath"><strong>--cert-dir</strong>=<em>path</em></h4>
+<p>Use certificates at <em>path</em> (*.crt, *.cert, *.key) to connect
+to the registry. (Default: /etc/containers/certs.d) For details, see
+<strong><a
+href="https://github.com/containers/image/blob/main/docs/containers-certs.d.5.md">containers-certs.d(5)</a></strong>.
+(This option is not available with the remote Podman client, including
+Mac and Windows (excluding WSL2) machines)</p>
+<h4 id="configmappath"><strong>--configmap</strong>=<em>path</em></h4>
+<p>Use Kubernetes configmap YAML at path to provide a source for
+environment variable values within the containers of the pod. (This
+option is not available with the remote Podman client)</p>
+<p>Note: The <em>--configmap</em> option can be used multiple times or a
+comma-separated list of paths can be used to pass multiple Kubernetes
+configmap YAMLs. The YAML file may be in a multi-doc YAML format. But,
+it must container only configmaps</p>
+<h4
+id="context-dirpath"><strong>--context-dir</strong>=<em>path</em></h4>
+<p>Use <em>path</em> as the build context directory for each image.
+Requires --build option be true. (This option is not available with the
+remote Podman client)</p>
+<h4
+id="credsusernamepassword"><strong>--creds</strong>=<em>[username[:password]]</em></h4>
+<p>The [username[:password]] to use to authenticate with the registry,
+if required. If one or both values are not supplied, a command line
+prompt appears and the value can be entered. The password is entered
+without echo.</p>
+<p>Note that the specified credentials are only used to authenticate
+against target registries. They are not used for mirrors or when the
+registry gets rewritten (see
+<code>containers-registries.conf(5)</code>); to authenticate against
+those consider using a <code>containers-auth.json(5)</code> file.</p>
+<h4 id="force"><strong>--force</strong></h4>
+<p>Tear down the volumes linked to the PersistentVolumeClaims as part of
+--down</p>
+<h4 id="help--h"><strong>--help</strong>, <strong>-h</strong></h4>
+<p>Print usage statement</p>
+<h4 id="ipip-address"><strong>--ip</strong>=<em>IP address</em></h4>
+<p>Assign a static ip address to the pod. This option can be specified
+several times when kube play creates more than one pod. Note: When
+joining multiple networks use the <strong>--network
+name:ip=&lt;ip&gt;</strong> syntax.</p>
+<h4
+id="log-driverdriver"><strong>--log-driver</strong>=<em>driver</em></h4>
+<p>Set logging driver for all created containers.</p>
+<h4
+id="log-optnamevalue"><strong>--log-opt</strong>=<em>name=value</em></h4>
+<p>Logging driver specific options.</p>
+<p>Set custom logging configuration. The following <em>name</em>s are
+supported:</p>
+<p><strong>path</strong>: specify a path to the log file (e.g.
+<strong>--log-opt
+path=/var/log/container/mycontainer.json</strong>);</p>
+<p><strong>max-size</strong>: specify a max size of the log file (e.g.
+<strong>--log-opt max-size=10mb</strong>);</p>
+<p><strong>tag</strong>: specify a custom log tag for the container
+(e.g. <strong>--log-opt tag="{{.ImageName}}"</strong>. It supports the
+same keys as <strong>podman inspect --format</strong>. This option is
+currently supported only by the <strong>journald</strong> log
+driver.</p>
+<h4 id="mac-addressmac-address"><strong>--mac-address</strong>=<em>MAC
+address</em></h4>
+<p>Assign a static mac address to the pod. This option can be specified
+several times when kube play creates more than one pod. Note: When
+joining multiple networks use the <strong>--network
+name:mac=&lt;mac&gt;</strong> syntax.</p>
+<h4 id="networkmode---net"><strong>--network</strong>=<em>mode</em>,
+<strong>--net</strong></h4>
+<p>Set the network mode for the pod.</p>
+<p>Valid <em>mode</em> values are:</p>
+<ul>
+<li><p><strong>bridge[:OPTIONS,...]</strong>: Create a network stack on
+the default bridge. This is the default for rootful containers. It is
+possible to specify these additional options:</p>
+<ul>
+<li><strong>alias=</strong>_name_: Add network-scoped alias for the
+container.</li>
+<li><strong>ip=</strong>_IPv4_: Specify a static IPv4 address for this
+container.</li>
+<li><strong>ip6=</strong>_IPv6_: Specify a static IPv6 address for this
+container.</li>
+<li><strong>mac=</strong>_MAC_: Specify a static MAC address for this
+container.</li>
+<li><strong>interface_name=</strong>_name_: Specify a name for the
+created network interface inside the container.</li>
+<li><strong>host_interface_name=</strong>_name_: Specify a name for the
+created network interface outside the container.</li>
+</ul>
+<p>Any other options will be passed through to netavark without
+validation. This can be useful to pass arguments to netavark
+plugins.</p>
+<p>For example, to set a static ipv4 address and a static mac address,
+use
+<code>--network bridge:ip=10.88.0.10,mac=44:33:22:11:00:99</code>.</p></li>
+<li><p><em>&lt;network name or
+ID&gt;</em><strong>[:OPTIONS,...]</strong>: Connect to a user-defined
+network; this is the network name or ID from a network created by
+<strong><a href="podman-network-create.html">podman network
+create</a></strong>. It is possible to specify the same options
+described under the bridge mode above. Use the
+<strong>--network</strong> option multiple times to specify additional
+networks.<br />
+For backwards compatibility it is also possible to specify
+comma-separated networks on the first <strong>--network</strong>
+argument, however this prevents you from using the options described
+under the bridge section above.</p></li>
+<li><p><strong>none</strong>: Create a network namespace for the
+container but do not configure network interfaces for it, thus the
+container has no network connectivity.</p></li>
+<li><p><strong>container:</strong>_id_: Reuse another container's
+network stack.</p></li>
+<li><p><strong>host</strong>: Use the host's network namespace for the
+container instead of creating an isolated namespace. Warning: This gives
+the container full access to abstract Unix domain sockets and to TCP/UDP
+sockets bound to localhost. Since these mechanisms are often used to
+prevent access to sensitive system services, isolating them from access
+by external entities, use of this option may be considered a security
+vulnerability.</p></li>
+<li><p><strong>ns:</strong>_path_: Path to a network namespace to
+join.</p></li>
+<li><p><strong>private</strong>: Create a new namespace for the
+container. This uses the <strong>bridge</strong> mode for rootful
+containers and <strong>slirp4netns</strong> for rootless ones.</p></li>
+<li><p><strong>slirp4netns[:OPTIONS,...]</strong>: use
+<strong>slirp4netns</strong>(1) to create a user network stack. It is
+possible to specify these additional options, they can also be set with
+<code>network_cmd_options</code> in containers.conf:</p>
+<ul>
+<li><strong>allow_host_loopback=true|false</strong>: Allow slirp4netns
+to reach the host loopback IP (default is 10.0.2.2 or the second IP from
+slirp4netns cidr subnet when changed, see the cidr option below). The
+default is false.</li>
+<li><strong>mtu=</strong>_MTU_: Specify the MTU to use for this network.
+(Default is <code>65520</code>).</li>
+<li><strong>cidr=</strong>_CIDR_: Specify ip range to use for this
+network. (Default is <code>10.0.2.0/24</code>).</li>
+<li><strong>enable_ipv6=true|false</strong>: Enable IPv6. Default is
+true. (Required for <code>outbound_addr6</code>).</li>
+<li><strong>outbound_addr=</strong>_INTERFACE_: Specify the outbound
+interface slirp binds to (ipv4 traffic only).</li>
+<li><strong>outbound_addr=</strong>_IPv4_: Specify the outbound ipv4
+address slirp binds to.</li>
+<li><strong>outbound_addr6=</strong>_INTERFACE_: Specify the outbound
+interface slirp binds to (ipv6 traffic only).</li>
+<li><strong>outbound_addr6=</strong>_IPv6_: Specify the outbound ipv6
+address slirp binds to.</li>
+<li><strong>port_handler=rootlesskit</strong>: Use rootlesskit for port
+forwarding. Default.<br />
+Note: Rootlesskit changes the source IP address of incoming packets to
+an IP address in the container network namespace, usually
+<code>10.0.2.100</code>. If the application requires the real source IP
+address, e.g. web server logs, use the slirp4netns port handler. The
+rootlesskit port handler is also used for rootless containers when
+connected to user-defined networks.</li>
+<li><strong>port_handler=slirp4netns</strong>: Use the slirp4netns port
+forwarding, it is slower than rootlesskit but preserves the correct
+source IP address. This port handler cannot be used for user-defined
+networks.</li>
+</ul></li>
+<li><p><strong>pasta[:OPTIONS,...]</strong>: use
+<strong>pasta</strong>(1) to create a user-mode networking stack.<br />
+This is the default for rootless containers and only supported in
+rootless mode.<br />
+By default, IPv4 and IPv6 addresses and routes, as well as the pod
+interface name, are copied from the host. Port forwarding preserves the
+original source IP address. Options described in pasta(1) can be
+specified as comma-separated arguments.<br />
+In terms of pasta(1) options, <strong>--config-net</strong> is given by
+default, in order to configure networking when the container is started,
+and <strong>--no-map-gw</strong> is also assumed by default, to avoid
+direct access from container to host using the gateway address. The
+latter can be overridden by passing <strong>--map-gw</strong> in the
+pasta-specific options (despite not being an actual pasta(1)
+option).<br />
+For better integration with DNS handling, <strong>--dns-forward
+169.254.1.1</strong> is passed, and this address is added to
+resolv.conf(5) as first resolver. It is possible to pass
+<strong>--dns-forward</strong> explicitly in case a different IP address
+should be used. To make the <code>host.containers.internal</code>
+/etc/hosts entry work and allow connections to the host,
+<strong>--map-guest-addr 169.254.1.2</strong> is passed. Again, it can
+be set explicitly to choose a different IP address.<br />
+Also, <strong>-t none</strong> and <strong>-u none</strong> are passed
+if, respectively, no TCP or UDP port forwarding from host to container
+is configured (via Podman's <strong>--publish</strong> or by passing the
+pasta <strong>-t</strong>/<strong>-u</strong> options directly), to
+disable automatic port forwarding based on bound ports. Similarly,
+<strong>-T none</strong> and <strong>-U none</strong> are given to
+disable the same functionality from container to host.<br />
+All options can also be set in <strong><a
+href="https://github.com/containers/common/blob/main/docs/containers.conf.5.md">containers.conf(5)</a></strong>;
+see the <code>pasta_options</code> key under the network section in that
+file.<br />
+Some examples:</p>
+<ul>
+<li><strong>pasta:--map-gw</strong>: Allow the container to directly
+reach the host using the gateway address.</li>
+<li><strong>pasta:--mtu,1500</strong>: Specify a 1500 bytes MTU for the
+<em>tap</em> interface in the container.</li>
+<li><strong>pasta:--ipv4-only,-a,10.0.2.0,-n,24,-g,10.0.2.2,--dns-forward,10.0.2.3,-m,1500,--no-ndp,--no-dhcpv6,--no-dhcp</strong>,
+equivalent to default slirp4netns(1) options: disable IPv6, assign
+<code>10.0.2.0/24</code> to the <code>tap0</code> interface in the
+container, with gateway <code>10.0.2.3</code>, enable DNS forwarder
+reachable at <code>10.0.2.3</code>, set MTU to 1500 bytes, disable NDP,
+DHCPv6 and DHCP support.</li>
+<li><strong>pasta:-I,tap0,--ipv4-only,-a,10.0.2.0,-n,24,-g,10.0.2.2,--dns-forward,10.0.2.3,--no-ndp,--no-dhcpv6,--no-dhcp</strong>,
+equivalent to default slirp4netns(1) options with Podman overrides: same
+as above, but leave the MTU to 65520 bytes</li>
+<li><strong>pasta:-t,auto,-u,auto,-T,auto,-U,auto</strong>: enable
+automatic port forwarding based on observed bound ports from both host
+and container sides</li>
+<li><strong>pasta:-T,5201</strong>: enable forwarding of TCP port 5201
+from container to host, using the loopback interface instead of the tap
+interface for improved performance</li>
+</ul></li>
+</ul>
+<p>When no network option is specified and <em>host</em> network mode is
+not configured in the YAML file, a new network stack is created and pods
+are attached to it making possible pod to pod communication.</p>
+<h4 id="no-hostname"><strong>--no-hostname</strong></h4>
+<p>Do not create the <em>/etc/hostname</em> file in the containers.</p>
+<p>By default, Podman manages the <em>/etc/hostname</em> file, adding
+the container's own hostname. When the <strong>--no-hostname</strong>
+option is set, the image's <em>/etc/hostname</em> will be preserved
+unmodified if it exists.</p>
+<h4 id="no-hosts"><strong>--no-hosts</strong></h4>
+<p>Do not modify the <code>/etc/hosts</code> file in the pod.</p>
+<p>Podman assumes control over the pod's <code>/etc/hosts</code> file by
+default and adds entries for the container's name (see
+<strong>--name</strong> option) and hostname (see
+<strong>--hostname</strong> option), the internal
+<code>host.containers.internal</code> and
+<code>host.docker.internal</code> hosts, as well as any hostname added
+using the <strong>--add-host</strong> option. Refer to the
+<strong>--add-host</strong> option for details. Passing
+<strong>--no-hosts</strong> disables this, so that the image's
+<code>/etc/hosts</code> file is kept unmodified. The same can be
+achieved globally by setting <em>no_hosts=true</em> in
+<code>containers.conf</code>.</p>
+<p>This option conflicts with host added in the Kubernetes YAML.</p>
+<h4
+id="publishiphostportcontainerportprotocol"><strong>--publish</strong>=<em>[[ip:][hostPort]:]containerPort[/protocol]</em></h4>
+<p>Define or override a port definition in the YAML file.</p>
+<p>The lists of ports in the YAML file and the command line are merged.
+Matching is done by using the <strong>containerPort</strong> field. If
+<strong>containerPort</strong> exists in both the YAML file and the
+option, the latter takes precedence.</p>
+<h4 id="publish-all"><strong>--publish-all</strong></h4>
+<p>Setting this option to <code>true</code> will expose all ports to the
+host, even if only specified via <strong>containerPort</strong> in the
+K8 YAML. In terms of which port will be exposed,
+<strong>--publish</strong> has higher priority than
+<strong>hostPort</strong>, has higher priority than
+<strong>containerPort</strong>.</p>
+<p>If set to <code>false</code> (which is the default), only ports
+defined via <strong>hostPort</strong> or <strong>--publish</strong> are
+published on the host.</p>
+<h4 id="quiet--q"><strong>--quiet</strong>, <strong>-q</strong></h4>
+<p>Suppress output information when pulling images</p>
+<h4 id="replace"><strong>--replace</strong></h4>
+<p>Tears down the pods created by a previous run of
+<code>kube play</code> and recreates the pods. This option is used to
+keep the existing pods up to date based upon the Kubernetes YAML.</p>
+<h4
+id="seccomp-profile-rootpath"><strong>--seccomp-profile-root</strong>=<em>path</em></h4>
+<p>Directory path for seccomp profiles (default:
+"/var/lib/kubelet/seccomp"). (This option is not available with the
+remote Podman client, including Mac and Windows (excluding WSL2)
+machines)</p>
+<h4 id="start"><strong>--start</strong></h4>
+<p>Start the pod after creating it, set to false to only create it.</p>
+<h4 id="tls-verify"><strong>--tls-verify</strong></h4>
+<p>Require HTTPS and verify certificates when contacting registries
+(default: <strong>true</strong>). If explicitly set to
+<strong>true</strong>, TLS verification is used. If set to
+<strong>false</strong>, TLS verification is not used. If not specified,
+TLS verification is used unless the target registry is listed as an
+insecure registry in <strong><a
+href="https://github.com/containers/image/blob/main/docs/containers-registries.conf.5.md">containers-registries.conf(5)</a></strong></p>
+<h4 id="usernsmode"><strong>--userns</strong>=<em>mode</em></h4>
+<p>Set the user namespace mode for the container.</p>
+<p>If <code>--userns</code> is not set, the default value is determined
+as follows. - If <code>--pod</code> is set, <code>--userns</code> is
+ignored and the user namespace of the pod is used. - If the environment
+variable <strong>PODMAN_USERNS</strong> is set its value is used. - If
+<code>userns</code> is specified in <code>containers.conf</code> this
+value is used. - Otherwise, <code>--userns=host</code> is assumed.</p>
+<p><code>--userns=""</code> (i.e., an empty string) is an alias for
+<code>--userns=host</code>.</p>
+<p>This option is incompatible with <strong>--gidmap</strong>,
+<strong>--uidmap</strong>, <strong>--subuidname</strong> and
+<strong>--subgidname</strong>.</p>
+<p>Rootless user --userns=Key mappings:</p>
+<table>
+<colgroup>
+<col style="width: 42%" />
+<col style="width: 19%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Key</th>
+<th>Host User</th>
+<th>Container User</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>auto</td>
+<td>$UID</td>
+<td>nil (Host User UID is not mapped into container.)</td>
+</tr>
+<tr class="even">
+<td>host</td>
+<td>$UID</td>
+<td>0 (Default User account mapped to root user in container.)</td>
+</tr>
+<tr class="odd">
+<td>keep-id</td>
+<td>$UID</td>
+<td>$UID (Map user account to same UID within container.)</td>
+</tr>
+<tr class="even">
+<td>keep-id:uid=200,gid=210</td>
+<td>$UID</td>
+<td>200:210 (Map user account to specified UID, GID value within
+container.)</td>
+</tr>
+<tr class="odd">
+<td>nomap</td>
+<td>$UID</td>
+<td>nil (Host User UID is not mapped into container.)</td>
+</tr>
+</tbody>
+</table>
+<p>Valid <em>mode</em> values are:</p>
+<p><strong>auto</strong>[:<em>OPTIONS,...</em>]: automatically create a
+unique user namespace.</p>
+<ul>
+<li><p><code>rootful mode</code>: The <code>--userns=auto</code> flag
+requires that the user name <strong>containers</strong> be specified in
+the /etc/subuid and /etc/subgid files, with an unused range of
+subordinate user IDs that Podman containers are allowed to allocate.
+Example: <code>containers:2147483647:2147483648</code>.</p></li>
+<li><p><code>rootless mode</code>: The users range from the /etc/subuid
+and /etc/subgid files will be used. Note running a single container
+without using --userns=auto will use the entire range of UIDs and not
+allow further subdividing. See subuid(5).</p></li>
+</ul>
+<p>Podman allocates unique ranges of UIDs and GIDs from the
+<code>containers</code> subordinate user IDs. The size of the ranges is
+based on the number of UIDs required in the image. The number of UIDs
+and GIDs can be overridden with the <code>size</code> option.</p>
+<p>The option <code>--userns=keep-id</code> uses all the subuids and
+subgids of the user. The option <code>--userns=nomap</code> uses all the
+subuids and subgids of the user except the user's own ID. Using
+<code>--userns=auto</code> when starting new containers does not work as
+long as any containers exist that were started with
+<code>--userns=nomap</code> or <code>--userns=keep-id</code> without
+limiting the user namespace size.</p>
+<p>Valid <code>auto</code> options:</p>
+<ul>
+<li><em>gidmapping</em>=<em>CONTAINER_GID:HOST_GID:SIZE</em>: to force a
+GID mapping to be present in the user namespace.</li>
+<li><em>size</em>=<em>SIZE</em>: to specify an explicit size for the
+automatic user namespace. e.g. <code>--userns=auto:size=8192</code>. If
+<code>size</code> is not specified, <code>auto</code> estimates a size
+for the user namespace.</li>
+<li><em>uidmapping</em>=<em>CONTAINER_UID:HOST_UID:SIZE</em>: to force a
+UID mapping to be present in the user namespace.</li>
+</ul>
+<p>The host UID and GID in <em>gidmapping</em> and <em>uidmapping</em>
+can optionally be prefixed with the <code>@</code> symbol. In this case,
+podman will look up the intermediate ID corresponding to host ID and it
+will map the found intermediate ID to the container id. For details see
+<strong>--uidmap</strong>.</p>
+<p><strong>container:</strong>_id_: join the user namespace of the
+specified container.</p>
+<p><strong>host</strong> or <strong>""</strong> (empty string): run in
+the user namespace of the caller. The processes running in the container
+have the same privileges on the host as any other process launched by
+the calling user.</p>
+<p><strong>keep-id</strong>: creates a user namespace where the current
+user's UID:GID are mapped to the same values in the container. For
+containers created by root, the current mapping is created into a new
+user namespace.</p>
+<p>Valid <code>keep-id</code> options:</p>
+<ul>
+<li><em>uid</em>=UID: override the UID inside the container that is used
+to map the current user to.</li>
+<li><em>gid</em>=GID: override the GID inside the container that is used
+to map the current user to.</li>
+<li><em>size</em>=SIZE: override the size of the configured user
+namespace. It is useful to not saturate all the available IDs. Not
+supported when running as root.</li>
+</ul>
+<p><strong>nomap</strong>: creates a user namespace where the current
+rootless user's UID:GID are not mapped into the container. This option
+is not allowed for containers created by the root user.</p>
+<p><strong>ns:</strong>_namespace_: run the pod in the given existing
+user namespace.</p>
+<h4 id="wait--w"><strong>--wait</strong>, <strong>-w</strong></h4>
+<p>Run pods and containers in the foreground. Default is false.</p>
+<p>At any time you can run <code>podman pod ps</code> in another shell
+to view a list of the running pods and containers.</p>
+<p>When attached in the tty mode, you can kill the pods and containers
+by pressing Ctrl-C or receiving any other interrupt signals.</p>
+<p>All pods, containers, and volumes created with
+<code>podman kube play</code> is removed upon exit.</p>
+<h2 id="examples">EXAMPLES</h2>
+<p>Recreate the pod and containers described in the specified host YAML
+file.</p>
+<pre><code>$ podman kube play demo.yml
+52182811df2b1e73f36476003a66ec872101ea59034ac0d4d3a7b40903b955a6</code></pre>
+<p>Recreate the pod and containers specified in a YAML file sent to
+stdin.</p>
+<pre><code>$ cat demo.yml | podman kube play -
+52182811df2b1e73f36476003a66ec872101ea59034ac0d4d3a7b40903b955a6</code></pre>
+<p>Tear down the pod and containers as described in the specified YAML
+file.</p>
+<pre><code>$  podman kube play --down demo.yml
+Pods stopped:
+52182811df2b1e73f36476003a66ec872101ea59034ac0d4d3a7b40903b955a6
+Pods removed:
+52182811df2b1e73f36476003a66ec872101ea59034ac0d4d3a7b40903b955a6</code></pre>
+<p>Provide multiple configmap files as sources for environment variables
+within the specified pods and containers.</p>
+<pre><code>$ podman kube play demo.yml --configmap configmap-foo.yml,configmap-bar.yml
+52182811df2b1e73f36476003a66ec872101ea59034ac0d4d3a7b40903b955a6
+
+$ podman kube play demo.yml --configmap configmap-foo.yml --configmap configmap-bar.yml
+52182811df2b1e73f36476003a66ec872101ea59034ac0d4d3a7b40903b955a6</code></pre>
+<p>Create a pod connected to two networks with a static ip on each.</p>
+<pre><code>$ podman kube play demo.yml --network net1:ip=10.89.1.5 --network net2:ip=10.89.10.10
+52182811df2b1e73f36476003a66ec872101ea59034ac0d4d3a7b40903b955a6</code></pre>
+<p>Please take into account that networks must be created first using
+podman-network-create(1).</p>
+<p>Create and teardown from a URL pointing to a YAML file.</p>
+<pre><code>$ podman kube play https://podman.io/demo.yml
+52182811df2b1e73f36476003a66ec872101ea59034ac0d4d3a7b40903b955a6
+
+$ podman kube play --down https://podman.io/demo.yml
+Pods stopped:
+52182811df2b1e73f36476003a66ec872101ea59034ac0d4d3a7b40903b955a6
+Pods removed:
+52182811df2b1e73f36476003a66ec872101ea59034ac0d4d3a7b40903b955a6</code></pre>
+<p><code>podman kube play --down</code> does not work with a URL if the
+YAML file the URL points to has been changed or altered.</p>
+<h1 id="podman-kube-play-support">Podman Kube Play Support</h1>
+<p>This document outlines the kube yaml fields that are currently
+supported by the <strong>podman kube play</strong> command.</p>
+<p>Note: <strong>N/A</strong> means that the option cannot be supported
+in a single-node Podman environment.</p>
+<h2 id="pod-fields">Pod Fields</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Support</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>containers</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>initContainers</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>imagePullSecrets</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>enableServiceLinks</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>os.name</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>volumes</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>nodeSelector</td>
+<td>N/A</td>
+</tr>
+<tr class="even">
+<td>nodeName</td>
+<td>N/A</td>
+</tr>
+<tr class="odd">
+<td>affinity.nodeAffinity</td>
+<td>N/A</td>
+</tr>
+<tr class="even">
+<td>affinity.podAffinity</td>
+<td>N/A</td>
+</tr>
+<tr class="odd">
+<td>affinity.podAntiAffinity</td>
+<td>N/A</td>
+</tr>
+<tr class="even">
+<td>tolerations.key</td>
+<td>N/A</td>
+</tr>
+<tr class="odd">
+<td>tolerations.operator</td>
+<td>N/A</td>
+</tr>
+<tr class="even">
+<td>tolerations.effect</td>
+<td>N/A</td>
+</tr>
+<tr class="odd">
+<td>tolerations.tolerationSeconds</td>
+<td>N/A</td>
+</tr>
+<tr class="even">
+<td>schedulerName</td>
+<td>N/A</td>
+</tr>
+<tr class="odd">
+<td>runtimeClassName</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>priorityClassName</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>priority</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>topologySpreadConstraints.maxSkew</td>
+<td>N/A</td>
+</tr>
+<tr class="odd">
+<td>topologySpreadConstraints.topologyKey</td>
+<td>N/A</td>
+</tr>
+<tr class="even">
+<td>topologySpreadConstraints.whenUnsatisfiable</td>
+<td>N/A</td>
+</tr>
+<tr class="odd">
+<td>topologySpreadConstraints.labelSelector</td>
+<td>N/A</td>
+</tr>
+<tr class="even">
+<td>topologySpreadConstraints.minDomains</td>
+<td>N/A</td>
+</tr>
+<tr class="odd">
+<td>restartPolicy</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>terminationGracePeriodSeconds</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>activeDeadlineSeconds</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>readinessGates.conditionType</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>hostname</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>setHostnameAsFQDN</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>subdomain</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>hostAliases.hostnames</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>hostAliases.ip</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>dnsConfig.nameservers</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>dnsConfig.options.name</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>dnsConfig.options.value</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>dnsConfig.searches</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>dnsPolicy</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>hostNetwork</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>hostPID</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>hostIPC</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>shareProcessNamespace</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>serviceAccountName</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>automountServiceAccountToken</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>securityContext.runAsUser</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>securityContext.runAsNonRoot</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>securityContext.runAsGroup</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>securityContext.supplementalGroups</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>securityContext.fsGroup</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>securityContext.fsGroupChangePolicy</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>securityContext.seccompProfile.type</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>securityContext.seccompProfile.localhostProfile</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>securityContext.seLinuxOptions.level</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>securityContext.seLinuxOptions.role</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>securityContext.seLinuxOptions.type</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>securityContext.seLinuxOptions.user</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>securityContext.sysctls.name</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>securityContext.sysctls.value</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>securityContext.windowsOptions.gmsaCredentialSpec</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>securityContext.windowsOptions.hostProcess</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>securityContext.windowsOptions.runAsUserName</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<h2 id="container-fields">Container Fields</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Support</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>name</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>image</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>imagePullPolicy</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>command</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>args</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>workingDir</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>ports.containerPort</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>ports.hostIP</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>ports.hostPort</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>ports.name</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>ports.protocol</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>env.name</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>env.value</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>env.valueFrom.configMapKeyRef.key</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>env.valueFrom.configMapKeyRef.name</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>env.valueFrom.configMapKeyRef.optional</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>env.valueFrom.fieldRef</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>env.valueFrom.resourceFieldRef</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>env.valueFrom.secretKeyRef.key</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>env.valueFrom.secretKeyRef.name</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>env.valueFrom.secretKeyRef.optional</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>envFrom.configMapRef.name</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>envFrom.configMapRef.optional</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>envFrom.prefix</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>envFrom.secretRef.name</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>envFrom.secretRef.optional</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>volumeMounts.mountPath</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>volumeMounts.name</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>volumeMounts.mountPropagation</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>volumeMounts.readOnly</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>volumeMounts.subPath</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>volumeMounts.subPathExpr</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>volumeDevices.devicePath</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>volumeDevices.name</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>resources.limits</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>resources.requests</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>lifecycle.postStart</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>lifecycle.preStop</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>lifecycle.stopSignal</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>terminationMessagePath</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>terminationMessagePolicy</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>livenessProbe</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>readinessProbe</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>startupProbe</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>securityContext.runAsUser</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>securityContext.runAsNonRoot</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>securityContext.runAsGroup</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>securityContext.readOnlyRootFilesystem</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>securityContext.procMount</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>securityContext.privileged</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>securityContext.allowPrivilegeEscalation</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>securityContext.capabilities.add</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>securityContext.capabilities.drop</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>securityContext.seccompProfile.type</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>securityContext.seccompProfile.localhostProfile</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>securityContext.seLinuxOptions.level</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>securityContext.seLinuxOptions.role</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>securityContext.seLinuxOptions.type</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>securityContext.seLinuxOptions.user</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>securityContext.windowsOptions.gmsaCredentialSpec</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>securityContext.windowsOptions.hostProcess</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>securityContext.windowsOptions.runAsUserName</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>stdin</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>stdinOnce</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>tty</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<h2 id="persistentvolumeclaim-fields">PersistentVolumeClaim Fields</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Support</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>volumeName</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>storageClassName</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>volumeMode</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>accessModes</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>selector</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>resources.limits</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>resources.requests</td>
+<td>&#x2705;</td>
+</tr>
+</tbody>
+</table>
+<h2 id="configmap-fields">ConfigMap Fields</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Support</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>binaryData</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>data</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>immutable</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deployment-fields">Deployment Fields</h2>
+<table>
+<colgroup>
+<col style="width: 42%" />
+<col style="width: 57%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Support</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>replicas</td>
+<td>&#x2705; (the actual replica count is ignored and set to 1)</td>
+</tr>
+<tr class="even">
+<td>selector</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>template</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>minReadySeconds</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>strategy.type</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>strategy.rollingUpdate.maxSurge</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>strategy.rollingUpdate.maxUnavailable</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>revisionHistoryLimit</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>progressDeadlineSeconds</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>paused</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<h2 id="daemonset-fields">DaemonSet Fields</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Support</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>selector</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>template</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="odd">
+<td>minReadySeconds</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>strategy.type</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>strategy.rollingUpdate.maxSurge</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>strategy.rollingUpdate.maxUnavailable</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>revisionHistoryLimit</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<h2 id="job-fields">Job Fields</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Support</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>activeDeadlineSeconds</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>selector</td>
+<td>no (automatically set by k8s)</td>
+</tr>
+<tr class="odd">
+<td>template</td>
+<td>&#x2705;</td>
+</tr>
+<tr class="even">
+<td>backoffLimit</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>completionMode</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>completions</td>
+<td>no (set to 1 with kube generate)</td>
+</tr>
+<tr class="odd">
+<td>manualSelector</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>parallelism</td>
+<td>no (set to 1 with kube generate)</td>
+</tr>
+<tr class="odd">
+<td>podFailurePolicy</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>suspend</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>ttlSecondsAfterFinished</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<h2 id="see-also">SEE ALSO</h2>
+<p><strong><a href="podman.html">podman(1)</a></strong>, <strong><a
+href="podman-kube.html">podman-kube(1)</a></strong>, <strong><a
+href="podman-kube-down.html">podman-kube-down(1)</a></strong>,
+<strong><a
+href="podman-network-create.html">podman-network-create(1)</a></strong>,
+<strong><a
+href="podman-kube-generate.html">podman-kube-generate(1)</a></strong>,
+<strong><a href="podman-build.html">podman-build(1)</a></strong>,
+<strong><a
+href="https://github.com/containers/image/blob/main/docs/containers-certs.d.5.md">containers-certs.d(5)</a></strong></p>
+</body>
+</html>

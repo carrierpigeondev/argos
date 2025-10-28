@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>podman-login 1</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<h2 id="name">NAME</h2>
+<p>podman-login - Log in to a container registry</p>
+<h2 id="synopsis">SYNOPSIS</h2>
+<p><strong>podman login</strong> [<em>options</em>]
+[<em>registry</em>]</p>
+<h2 id="description">DESCRIPTION</h2>
+<p><strong>podman login</strong> logs into a specified registry server
+with the correct username and password. If the registry is not
+specified, the first registry under [registries.search] from
+registries.conf is used. <strong>podman login</strong> reads in the
+username and password from STDIN. The username and password can also be
+set using the <strong>username</strong> and <strong>password</strong>
+flags. The path of the authentication file can be specified by the user
+by setting the <strong>authfile</strong> flag. The default path for
+reading and writing credentials is <strong><span
+class="math inline"><em>X</em><em>D</em><em>G</em>_<em>R</em><em>U</em><em>N</em><em>T</em><em>I</em><em>M</em><em>E</em>_<em>D</em><em>I</em><em>R</em>/<em>c</em><em>o</em><em>n</em><em>t</em><em>a</em><em>i</em><em>n</em><em>e</em><em>r</em><em>s</em>/<em>a</em><em>u</em><em>t</em><em>h</em>.<em>j</em><em>s</em><em>o</em><em>n</em>&#x2005;*&#x2005;&#x2005;*&#x2005;.<em>P</em><em>o</em><em>d</em><em>m</em><em>a</em><em>n</em><em>u</em><em>s</em><em>e</em><em>s</em><em>e</em><em>x</em><em>i</em><em>s</em><em>t</em><em>i</em><em>n</em><em>g</em><em>c</em><em>r</em><em>e</em><em>d</em><em>e</em><em>n</em><em>t</em><em>i</em><em>a</em><em>l</em><em>s</em><em>i</em><em>f</em><em>t</em><em>h</em><em>e</em><em>u</em><em>s</em><em>e</em><em>r</em><em>d</em><em>o</em><em>e</em><em>s</em><em>n</em><em>o</em><em>t</em><em>p</em><em>a</em><em>s</em><em>s</em><em>i</em><em>n</em><em>a</em><em>u</em><em>s</em><em>e</em><em>r</em><em>n</em><em>a</em><em>m</em><em>e</em>.<em>P</em><em>o</em><em>d</em><em>m</em><em>a</em><em>n</em><em>f</em><em>i</em><em>r</em><em>s</em><em>t</em><em>s</em><em>e</em><em>a</em><em>r</em><em>c</em><em>h</em><em>e</em><em>s</em><em>f</em><em>o</em><em>r</em><em>t</em><em>h</em><em>e</em><em>u</em><em>s</em><em>e</em><em>r</em><em>n</em><em>a</em><em>m</em><em>e</em><em>a</em><em>n</em><em>d</em><em>p</em><em>a</em><em>s</em><em>s</em><em>w</em><em>o</em><em>r</em><em>d</em><em>i</em><em>n</em><em>t</em><em>h</em><em>e</em>&#x2005;*&#x2005;*</span>{XDG_RUNTIME_DIR}/containers/auth.json</strong>,
+if they are not valid, Podman then uses any existing credentials found
+in <strong><span
+class="math inline"><em>H</em><em>O</em><em>M</em><em>E</em>/.<em>d</em><em>o</em><em>c</em><em>k</em><em>e</em><em>r</em>/<em>c</em><em>o</em><em>n</em><em>f</em><em>i</em><em>g</em>.<em>j</em><em>s</em><em>o</em><em>n</em>&#x2005;*&#x2005;&#x2005;*&#x2005;.<em>I</em><em>f</em><em>t</em><em>h</em><em>o</em><em>s</em><em>e</em><em>c</em><em>r</em><em>e</em><em>d</em><em>e</em><em>n</em><em>t</em><em>i</em><em>a</em><em>l</em><em>s</em><em>a</em><em>r</em><em>e</em><em>n</em><em>o</em><em>t</em><em>p</em><em>r</em><em>e</em><em>s</em><em>e</em><em>n</em><em>t</em>,&#x2006;<em>P</em><em>o</em><em>d</em><em>m</em><em>a</em><em>n</em><em>c</em><em>r</em><em>e</em><em>a</em><em>t</em><em>e</em><em>s</em>&#x2005;*&#x2005;*</span>{XDG_RUNTIME_DIR}/containers/auth.json</strong>
+(if the file does not exist) and then stores the username and password
+from STDIN as a base64 encoded string in it. For more details about
+format and configurations of the auth.json file, see
+containers-auth.json(5)</p>
+<p><strong>podman [GLOBAL OPTIONS]</strong></p>
+<p><strong>podman login [GLOBAL OPTIONS]</strong></p>
+<p><strong>podman login <a href="#options">OPTIONS</a> [REGISTRY]
+[GLOBAL OPTIONS]</strong></p>
+<h2 id="options">OPTIONS</h2>
+<h4 id="authfilepath"><strong>--authfile</strong>=<em>path</em></h4>
+<p>Path of the authentication file. Default is
+<code>${XDG_RUNTIME_DIR}/containers/auth.json</code> on Linux, and
+<code>$HOME/.config/containers/auth.json</code> on Windows/macOS. The
+file is created by <strong><a href="podman-login.html">podman
+login</a></strong>. If the authorization state is not found there,
+<code>$HOME/.docker/config.json</code> is checked, which is set using
+<strong>docker login</strong>.</p>
+<p>Note: There is also the option to override the default path of the
+authentication file by setting the <code>REGISTRY_AUTH_FILE</code>
+environment variable. This can be done with <strong>export
+REGISTRY_AUTH_FILE=<em>path</em></strong>.</p>
+<h4 id="cert-dirpath"><strong>--cert-dir</strong>=<em>path</em></h4>
+<p>Use certificates at <em>path</em> (*.crt, *.cert, *.key) to connect
+to the registry. (Default: /etc/containers/certs.d) For details, see
+<strong><a
+href="https://github.com/containers/image/blob/main/docs/containers-certs.d.5.md">containers-certs.d(5)</a></strong>.
+(This option is not available with the remote Podman client, including
+Mac and Windows (excluding WSL2) machines)</p>
+<h4
+id="compat-auth-filepath"><strong>--compat-auth-file</strong>=<em>path</em></h4>
+<p>Instead of updating the default credentials file, update the one at
+<em>path</em>, and use a Docker-compatible format.</p>
+<h4 id="get-login"><strong>--get-login</strong></h4>
+<p>Return the logged-in user for the registry. Return error if no login
+is found.</p>
+<h4 id="help--h"><strong>--help</strong>, <strong>-h</strong></h4>
+<p>Print usage statement</p>
+<h4 id="password--ppassword"><strong>--password</strong>,
+<strong>-p</strong>=<em>password</em></h4>
+<p>Password for registry</p>
+<h4 id="password-stdin"><strong>--password-stdin</strong></h4>
+<p>Take the password from stdin</p>
+<h4 id="secretname"><strong>--secret</strong>=<em>name</em></h4>
+<p>Read the password for the registry from the podman secret
+<code>name</code>. If --username is not specified
+--username=<code>name</code> is used.</p>
+<h4 id="tls-verify"><strong>--tls-verify</strong></h4>
+<p>Require HTTPS and verify certificates when contacting registries
+(default: <strong>true</strong>). If explicitly set to
+<strong>true</strong>, TLS verification is used. If set to
+<strong>false</strong>, TLS verification is not used. If not specified,
+TLS verification is used unless the target registry is listed as an
+insecure registry in <strong><a
+href="https://github.com/containers/image/blob/main/docs/containers-registries.conf.5.md">containers-registries.conf(5)</a></strong></p>
+<h4 id="username--uusername"><strong>--username</strong>,
+<strong>-u</strong>=<em>username</em></h4>
+<p>Username for registry</p>
+<h4 id="verbose--v"><strong>--verbose</strong>, <strong>-v</strong></h4>
+<p>print detailed information about credential store</p>
+<h2 id="examples">EXAMPLES</h2>
+<p>Add login credentials for specified registry to default
+authentication file; note that unlike the <code>docker</code> default,
+the default credentials are under <code>$XDG_RUNTIME_DIR</code> which is
+a subdirectory of <code>/run</code> (an emphemeral directory) and hence
+do not persist across reboot.</p>
+<pre><code>$ podman login quay.io
+Username: umohnani
+Password:
+Login Succeeded!</code></pre>
+<p>To explicitly preserve credentials across reboot, you will need to
+specify the default persistent path:</p>
+<pre><code>$ podman login --authfile ~/.config/containers/auth.json quay.io
+Username: umohnani
+Password:
+Login Succeeded!</code></pre>
+<p>Add login credentials using specified username and password for local
+registry to default authentication file.</p>
+<pre><code>$ podman login -u testuser -p testpassword localhost:5000
+Login Succeeded!</code></pre>
+<p>Add login credentials for alternate authfile path for the specified
+registry.</p>
+<pre><code>$ podman login --authfile authdir/myauths.json quay.io
+Username: umohnani
+Password:
+Login Succeeded!</code></pre>
+<p>Add login credentials using a Podman secret for the password.</p>
+<pre><code>$ echo -n MySecret! | podman secret create secretname -
+a0ad54df3c97cf89d5ca6193c
+$ podman login --secret secretname -u testuser quay.io
+Login Succeeded!</code></pre>
+<p>Add login credentials for user test with password test to
+localhost:5000 registry disabling tls verification requirement.</p>
+<pre><code>$ podman login --tls-verify=false -u test -p test localhost:5000
+Login Succeeded!</code></pre>
+<p>Add login credentials for user foo with password bar to
+localhost:5000 registry using the certificate directory
+/etc/containers/certs.d.</p>
+<pre><code>$ podman login --cert-dir /etc/containers/certs.d/ -u foo -p bar localhost:5000
+Login Succeeded!</code></pre>
+<p>Add login credentials for specified registries to default
+authentication file for given user with password information provided
+via stdin from a file on disk.</p>
+<pre><code>$ podman login -u testuser  --password-stdin &lt; testpassword.txt docker.io
+Login Succeeded!</code></pre>
+<p>Add login credentials for specified registry to default
+authentication file for given user with password information provided
+via stdin from a pipe.</p>
+<pre><code>$ echo $testpassword | podman login -u testuser --password-stdin quay.io
+Login Succeeded!</code></pre>
+<p>Add login credentials for specified registry to default
+authentication file in verbose mode.</p>
+<pre><code>$ podman login quay.io --verbose
+Username: myusername
+Password:
+Used: /run/user/1000/containers/auth.json
+Login Succeeded!</code></pre>
+<h2 id="see-also">SEE ALSO</h2>
+<p><strong><a href="podman.html">podman(1)</a></strong>, <strong><a
+href="podman-logout.html">podman-logout(1)</a></strong>, <strong><a
+href="https://github.com/containers/image/blob/main/docs/containers-auth.json.5.md">containers-auth.json(5)</a></strong>,
+<strong><a
+href="https://github.com/containers/image/blob/main/docs/containers-certs.d.5.md">containers-certs.d(5)</a></strong>,
+<strong><a
+href="https://github.com/containers/image/blob/main/docs/containers-registries.conf.5.md">containers-registries.conf(5)</a></strong>,
+<strong><a href="podman-secret.html">podman-secret(1)</a></strong>,
+<strong><a
+href="podman-secret-create.html">podman-secret-create(1)</a></strong></p>
+<h2 id="history">HISTORY</h2>
+<p>August 2017, Originally compiled by Urvashi Mohnani <a
+href="mailto:umohnani@redhat.com"
+class="email">umohnani@redhat.com</a></p>
+</body>
+</html>

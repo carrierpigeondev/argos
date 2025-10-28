@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>podman-network 1</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<h2 id="name">NAME</h2>
+<p>podman-network - Manage Podman networks</p>
+<h2 id="synopsis">SYNOPSIS</h2>
+<p><strong>podman network</strong> <em>subcommand</em></p>
+<h2 id="description">DESCRIPTION</h2>
+<p>The network command manages networks for Podman.</p>
+<p>Podman supports two network backends <a
+href="https://github.com/containers/netavark">Netavark</a> and <a
+href="https://www.cni.dev/">CNI</a>. Netavark is the default network
+backend and was added in Podman version 4.0. CNI is deprecated and will
+be removed in the next major Podman version 5.0, in preference of
+Netavark. To configure the network backend use the
+<code>network_backend</code> key under the <code>[Network]</code> in
+<strong><a
+href="https://github.com/containers/common/blob/main/docs/containers.conf.5.md">containers.conf(5)</a></strong>.
+New systems use netavark by default, to check what backend is used run
+<code>podman info --format {{.Host.NetworkBackend}}</code>.</p>
+<p>All network commands work for both backends but CNI and Netavark use
+different config files so networks have to be created again after a
+backend change.</p>
+<h2 id="commands">COMMANDS</h2>
+<table>
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 45%" />
+<col style="width: 46%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Command</th>
+<th>Man Page</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>connect</td>
+<td><a
+href="podman-network-connect.html">podman-network-connect(1)</a></td>
+<td>Connect a container to a network</td>
+</tr>
+<tr class="even">
+<td>create</td>
+<td><a
+href="podman-network-create.html">podman-network-create(1)</a></td>
+<td>Create a Podman network</td>
+</tr>
+<tr class="odd">
+<td>disconnect</td>
+<td><a
+href="podman-network-disconnect.html">podman-network-disconnect(1)</a></td>
+<td>Disconnect a container from a network</td>
+</tr>
+<tr class="even">
+<td>exists</td>
+<td><a
+href="podman-network-exists.html">podman-network-exists(1)</a></td>
+<td>Check if the given network exists</td>
+</tr>
+<tr class="odd">
+<td>inspect</td>
+<td><a
+href="podman-network-inspect.html">podman-network-inspect(1)</a></td>
+<td>Display the network configuration for one or more networks</td>
+</tr>
+<tr class="even">
+<td>ls</td>
+<td><a href="podman-network-ls.html">podman-network-ls(1)</a></td>
+<td>Display a summary of networks</td>
+</tr>
+<tr class="odd">
+<td>prune</td>
+<td><a href="podman-network-prune.html">podman-network-prune(1)</a></td>
+<td>Remove all unused networks</td>
+</tr>
+<tr class="even">
+<td>reload</td>
+<td><a
+href="podman-network-reload.html">podman-network-reload(1)</a></td>
+<td>Reload network configuration for containers</td>
+</tr>
+<tr class="odd">
+<td>rm</td>
+<td><a href="podman-network-rm.html">podman-network-rm(1)</a></td>
+<td>Remove one or more networks</td>
+</tr>
+<tr class="even">
+<td>update</td>
+<td><a
+href="podman-network-update.html">podman-network-update(1)</a></td>
+<td>Update an existing Podman network</td>
+</tr>
+</tbody>
+</table>
+<h2 id="subnet-notes">SUBNET NOTES</h2>
+<p>Podman requires specific default IPs and, thus, network subnets. The
+default values used by Podman can be modified in the <strong><a
+href="https://github.com/containers/common/blob/main/docs/containers.conf.5.md">containers.conf(5)</a></strong>
+file.</p>
+<h3 id="podman-network">Podman network</h3>
+<p>The default bridge network (called <code>podman</code>) uses
+10.88.0.0/16 as a subnet. When Podman runs as root, the
+<code>podman</code> network is used as default. It is the same as adding
+the option <code>--network bridge</code> or
+<code>--network podman</code>. This subnet can be changed in <strong><a
+href="https://github.com/containers/common/blob/main/docs/containers.conf.5.md">containers.conf(5)</a></strong>
+under the [network] section. Set the <code>default_subnet</code> to any
+subnet that is free in the environment. The name of the default network
+can also be changed from <code>podman</code> to another name using the
+default network key. Note that this is only done when no containers are
+running.</p>
+<h3 id="pasta">Pasta</h3>
+<p>Pasta by default performs no Network Address Translation (NAT) and
+copies the IPs from your main interface into the container namespace. If
+pasta cannot find an interface with the default route, it will select an
+interface if there is only one interface with a valid route. If you do
+not have a default route and several interfaces have defined routes,
+pasta will be unable to figure out the correct interface and it will
+fail to start. To specify the interface, use <code>-i</code> option to
+pasta. A default set of pasta options can be set in <strong><a
+href="https://github.com/containers/common/blob/main/docs/containers.conf.5.md">containers.conf(5)</a></strong>
+under the <code>[network]</code> section with the
+<code>pasta_options</code> key.</p>
+<p>The default rootless networking tool can be selected in <strong><a
+href="https://github.com/containers/common/blob/main/docs/containers.conf.5.md">containers.conf(5)</a></strong>
+under the <code>[network]</code> section with
+<code>default_rootless_network_cmd</code>, which can be set to
+<code>pasta</code> (default) or <code>slirp4netns</code>.</p>
+<h3 id="slirp4netns">Slirp4netns</h3>
+<p>Slirp4netns uses 10.0.2.0/24 for its default network. This can also
+be changed in <strong><a
+href="https://github.com/containers/common/blob/main/docs/containers.conf.5.md">containers.conf(5)</a></strong>
+but under the <code>[engine]</code> section. Use the
+<code>network_cmd_options</code> key and add
+<code>["cidr=X.X.X.X/24"]</code> as a value. Note that slirp4netns needs
+a network prefix size between 1 and 25. This option accepts an array, so
+more options can be added in a comma-separated string as described on
+the <strong><a
+href="podman-network-create.html">podman-network-create(1)</a></strong>
+man page. To change the CIDR for just one container, specify it on the
+cli using the <code>--network</code> option like this:
+<code>--network slirp4netns:cidr=192.168.1.0/24</code>.</p>
+<h3 id="podman-network-create">Podman network create</h3>
+<p>When a new network is created with a
+<code>podman network create</code> command, and no subnet is given with
+the --subnet option, Podman starts picking a free subnet from
+10.89.0.0/24 to 10.255.255.0/24. Use the
+<code>default_subnet_pools</code> option under the
+<code>[network]</code> section in <strong><a
+href="https://github.com/containers/common/blob/main/docs/containers.conf.5.md">containers.conf(5)</a></strong>
+to change the range and/or size that is assigned by default.</p>
+<h2 id="see-also">SEE ALSO</h2>
+<p><strong><a href="podman.html">podman(1)</a></strong>, <strong><a
+href="podman-network-create.html">podman-network-create(1)</a></strong>,
+<strong><a
+href="https://github.com/containers/common/blob/main/docs/containers.conf.5.md">containers.conf(5)</a></strong></p>
+</body>
+</html>

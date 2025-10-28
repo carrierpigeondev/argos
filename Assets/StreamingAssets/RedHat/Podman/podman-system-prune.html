@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>podman-system-prune 1</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<h2 id="name">NAME</h2>
+<p>podman-system-prune - Remove all unused pods, containers, images,
+networks, and volume data</p>
+<h2 id="synopsis">SYNOPSIS</h2>
+<p><strong>podman system prune</strong> [<em>options</em>]</p>
+<h2 id="description">DESCRIPTION</h2>
+<p><strong>podman system prune</strong> removes all unused containers
+(both dangling and unreferenced), build containers, pods, networks, and
+optionally, volumes from local storage.</p>
+<p>Use the <strong>--all</strong> option to delete all unused images.
+Unused images are dangling images as well as any image that does not
+have any containers based on it.</p>
+<p>By default, volumes are not removed to prevent important data from
+being deleted if there is currently no container using the volume. Use
+the <strong>--volumes</strong> flag when running the command to prune
+volumes as well.</p>
+<p>By default, build containers are not removed to prevent interference
+with builds in progress. Use the <strong>--build</strong> flag when
+running the command to remove build containers as well.</p>
+<h2 id="options">OPTIONS</h2>
+<h4 id="all--a"><strong>--all</strong>, <strong>-a</strong></h4>
+<p>Recursively remove all unused pods, containers, images, networks, and
+volume data. (Maximum 50 iterations.)</p>
+<h4 id="build"><strong>--build</strong></h4>
+<p>Removes any build containers that were created during the build, but
+were not removed because the build was unexpectedly terminated.</p>
+<p>Note: <strong>This is not safe operation and should be executed only
+when no builds are in progress. It can interfere with builds in
+progress.</strong></p>
+<h4 id="external"><strong>--external</strong></h4>
+<p>Tries to clean up remainders of previous containers or layers that
+are not references in the storage json files. These can happen in the
+case of unclean shutdowns or regular restarts in transient storage
+mode.</p>
+<p>However, when using transient storage mode, the Podman database does
+not persist. This means containers leave the writable layers on disk
+after a reboot. When using a transient store, it is recommended that the
+<strong>podman system prune --external</strong> command is run during
+boot.</p>
+<p>This option is incompatible with <strong>--all</strong> and
+<strong>--filter</strong> and drops the default behaviour of removing
+unused resources.</p>
+<h4 id="filterfilters"><strong>--filter</strong>=<em>filters</em></h4>
+<p>Provide filter values.</p>
+<p>The <em>filters</em> argument format is of <code>key=value</code>. If
+there is more than one <em>filter</em>, then pass multiple OPTIONS:
+<strong>--filter</strong> <em>foo=bar</em> <strong>--filter</strong>
+<em>bif=baz</em>.</p>
+<p>Supported filters:</p>
+<table>
+<colgroup>
+<col style="width: 6%" />
+<col style="width: 93%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Filter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">label</td>
+<td>Only remove containers and images, with (or without, in the case of
+label!=[...] is used) the specified labels.</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">until</td>
+<td>Only remove containers and images created before given
+timestamp.</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>label</code> <em>filter</em> accepts two formats. One is
+the <code>label</code>=<em>key</em> or
+<code>label</code>=<em>key</em>=<em>value</em>, which removes containers
+and images with the specified labels. The other format is the
+<code>label!</code>=<em>key</em> or
+<code>label!</code>=<em>key</em>=<em>value</em>, which removes
+containers and images without the specified labels.</p>
+<p>The <code>until</code> <em>filter</em> can be Unix timestamps, date
+formatted timestamps, or Go duration strings (e.g. 10m, 1h30m) computed
+relative to the machine&#x2019;s time.</p>
+<h4 id="force--f"><strong>--force</strong>, <strong>-f</strong></h4>
+<p>Do not prompt for confirmation</p>
+<h4 id="help--h"><strong>--help</strong>, <strong>-h</strong></h4>
+<p>Print usage statement</p>
+<h4 id="volumes"><strong>--volumes</strong></h4>
+<p>Prune volumes currently unused by any container</p>
+<h2 id="examples">EXAMPLES</h2>
+<p>Prune all containers, pods, networks and dangling images.</p>
+<pre><code>$ podman system prune
+WARNING! This command removes:
+    - all stopped containers
+    - all networks not used by at least one container
+    - all dangling images
+    - all dangling build cache
+
+Are you sure you want to continue? [y/N] y
+Total reclaimed space: 0B</code></pre>
+<p>Prune all containers, pods, and networks that are not in use.</p>
+<pre><code>$ podman system prune --all
+WARNING! This command removes:
+    - all stopped containers
+    - all networks not used by at least one container
+    - all images without at least one container associated with them
+    - all build cache
+
+Are you sure you want to continue? [y/N] y
+Deleted Images
+ce21f047f73644dcb9cd55ad247433fb47ade48ad4f4e676881fbcb2d5735c76
+c874afc1f445044eaa821da0c32328707406e546a688d8c4c22587a5f88a1992
+2fce09cfad57c6de112654eeb6f6da1851f3ced1cff7ac0002378642c2c7ca84
+0cd6d2e072175191823999cd189f8d262ba5e460271095570d8cffb1d9072e9a
+172bdaffe628cc7b7f8b7b6695438afc612a9833382f5968a06740a3804c3b64
+bf07fec943ec23054f3b81c0e65926a1c83dc82c50933dc6372c60e09fdb2d4f
+b2f735cbb571dd6a28e66455af0623ecc81f9c5b74259d3e04b3bac3b178e965
+cea2ff433c610f5363017404ce989632e12b953114fefc6f597a58e813c15d61
+Deleted Networks
+podman-default-kube-network
+Total reclaimed space: 3.372GB</code></pre>
+<p>Prune all containers, build containers, pods, networks and dangling
+images.</p>
+<pre><code>$ podman system prune --build
+WARNING! This command removes:
+    - all stopped containers
+    - all networks not used by at least one container
+    - all build containers
+    - all dangling images
+    - all dangling build cache
+
+Are you sure you want to continue? [y/N] y
+Deleted Containers
+a8bfed41990114767c933d27bf5508b01cdc0f641dc36037b349648347c6ea64
+Deleted Images
+055733a33e7a78efa27d3c682df97a9e0489133bef071745144c8d0edda2d708
+Total reclaimed space: 1.4GB</code></pre>
+<p>With <code>--force</code> flag</p>
+<pre><code>$ podman system prune --force
+Total reclaimed space: 0B</code></pre>
+<h2 id="see-also">SEE ALSO</h2>
+<p><strong><a href="podman.html">podman(1)</a></strong>, <strong><a
+href="podman-system.html">podman-system(1)</a></strong></p>
+<h2 id="history">HISTORY</h2>
+<p>February 2019, Originally compiled by Dan Walsh (dwalsh at redhat dot
+com) December 2020, converted filter information from docs.docker.com
+documentation by Dan Walsh (dwalsh at redhat dot com)</p>
+</body>
+</html>

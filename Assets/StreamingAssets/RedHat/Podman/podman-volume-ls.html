@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>podman-volume-ls 1</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<h2 id="name">NAME</h2>
+<p>podman-volume-ls - List all the available volumes</p>
+<h2 id="synopsis">SYNOPSIS</h2>
+<p><strong>podman volume ls</strong> [<em>options</em>]</p>
+<h2 id="description">DESCRIPTION</h2>
+<p>Lists all the volumes that exist. The output can be filtered using
+the <strong>--filter</strong> flag and can be formatted to either JSON
+or a Go template using the <strong>--format</strong> flag. Use the
+<strong>--quiet</strong> flag to print only the volume names.</p>
+<h2 id="options">OPTIONS</h2>
+<h4 id="filter--ffilter"><strong>--filter</strong>,
+<strong>-f</strong>=<em>filter</em></h4>
+<p>Filter what volumes are shown in the output. Multiple filters can be
+given with multiple uses of the --filter flag. Filters with the same key
+work inclusive, with the only exception being <code>label</code> which
+is exclusive. Filters with different keys always work exclusive.</p>
+<p>Volumes can be filtered by the following attributes:</p>
+<table>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 89%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Filter</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>dangling</td>
+<td>[Dangling] Matches all volumes not referenced by any containers</td>
+</tr>
+<tr class="even">
+<td>driver</td>
+<td>[Driver] Matches volumes based on their driver</td>
+</tr>
+<tr class="odd">
+<td>label</td>
+<td>[Key] or [Key=Value] Label assigned to a volume</td>
+</tr>
+<tr class="even">
+<td>name</td>
+<td><a href="#name">Name</a> Volume name (accepts regex)</td>
+</tr>
+<tr class="odd">
+<td>opt</td>
+<td>Matches a storage driver options</td>
+</tr>
+<tr class="even">
+<td>scope</td>
+<td>Filters volume by scope</td>
+</tr>
+<tr class="odd">
+<td>after/since</td>
+<td>Filter by volumes created after the given VOLUME (name or tag)</td>
+</tr>
+<tr class="even">
+<td>until</td>
+<td>Only remove volumes created before given timestamp</td>
+</tr>
+</tbody>
+</table>
+<h4 id="formatformat"><strong>--format</strong>=<em>format</em></h4>
+<p>Format volume output using Go template.</p>
+<p>Valid placeholders for the Go template are listed below:</p>
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 63%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Placeholder</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>.Anonymous</td>
+<td>Indicates whether volume is anonymous</td>
+</tr>
+<tr class="even">
+<td>.CreatedAt ...</td>
+<td>Volume creation time</td>
+</tr>
+<tr class="odd">
+<td>.Driver</td>
+<td>Volume driver</td>
+</tr>
+<tr class="even">
+<td>.GID</td>
+<td>GID of volume</td>
+</tr>
+<tr class="odd">
+<td>.InspectVolumeData ...</td>
+<td>Don't use</td>
+</tr>
+<tr class="even">
+<td>.Labels ...</td>
+<td>Label information associated with the volume</td>
+</tr>
+<tr class="odd">
+<td>.LockNumber</td>
+<td>Number of the volume's Libpod lock</td>
+</tr>
+<tr class="even">
+<td>.MountCount</td>
+<td>Number of times the volume is mounted</td>
+</tr>
+<tr class="odd">
+<td>.Mountpoint</td>
+<td>Source of volume mount point</td>
+</tr>
+<tr class="even">
+<td>.Name</td>
+<td>Volume name</td>
+</tr>
+<tr class="odd">
+<td>.NeedsChown</td>
+<td>Indicates whether volume needs to be chowned</td>
+</tr>
+<tr class="even">
+<td>.NeedsCopyUp</td>
+<td>Indicates if volume needs to be copied up to</td>
+</tr>
+<tr class="odd">
+<td>.Options ...</td>
+<td>Volume options</td>
+</tr>
+<tr class="even">
+<td>.Scope</td>
+<td>Volume scope</td>
+</tr>
+<tr class="odd">
+<td>.Status ...</td>
+<td>Status of the volume</td>
+</tr>
+<tr class="even">
+<td>.StorageID</td>
+<td>StorageID of the volume</td>
+</tr>
+<tr class="odd">
+<td>.Timeout</td>
+<td>Timeout of the volume</td>
+</tr>
+<tr class="even">
+<td>.UID</td>
+<td>UID of volume</td>
+</tr>
+<tr class="odd">
+<td>.VolumeConfigResponse ...</td>
+<td>Don't use</td>
+</tr>
+</tbody>
+</table>
+<h4 id="help"><strong>--help</strong></h4>
+<p>Print usage statement.</p>
+<h4 id="noheading--n"><strong>--noheading</strong>,
+<strong>-n</strong></h4>
+<p>Omit the table headings from the listing.</p>
+<h4 id="quiet--q"><strong>--quiet</strong>, <strong>-q</strong></h4>
+<p>Print volume output in quiet mode. Only print the volume names.</p>
+<h2 id="examples">EXAMPLES</h2>
+<p>List all volumes.</p>
+<pre><code>$ podman volume ls</code></pre>
+<p>List all volumes and display content as json format.</p>
+<pre><code>$ podman volume ls --format json</code></pre>
+<p>List all volumes and display their Driver and Scope fields</p>
+<pre><code>$ podman volume ls --format &quot;{{.Driver}} {{.Scope}}&quot;</code></pre>
+<p>List volumes with the name foo and label blue.</p>
+<pre><code>$ podman volume ls --filter name=foo,label=blue</code></pre>
+<p>List volumes with the label key=value.</p>
+<pre><code>$ podman volume ls --filter label=key=value</code></pre>
+<h2 id="see-also">SEE ALSO</h2>
+<p><strong><a href="podman.html">podman(1)</a></strong>, <strong><a
+href="podman-volume.html">podman-volume(1)</a></strong></p>
+<h2 id="history">HISTORY</h2>
+<p>November 2018, Originally compiled by Urvashi Mohnani <a
+href="mailto:umohnani@redhat.com"
+class="email">umohnani@redhat.com</a></p>
+</body>
+</html>

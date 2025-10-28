@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>podman-manifest-annotate 1</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<h2 id="name">NAME</h2>
+<p>podman-manifest-annotate - Add and update information about an image
+or artifact in a manifest list or image index</p>
+<h2 id="synopsis">SYNOPSIS</h2>
+<p><strong>podman manifest annotate</strong> [<em>options</em>]
+<em>listnameorindexname</em>
+<em>imagemanifestdigestorimageorartifactname</em></p>
+<h2 id="description">DESCRIPTION</h2>
+<p>Adds or updates information about an image or artifact included in a
+manifest list or image index.</p>
+<h2 id="options">OPTIONS</h2>
+<h4
+id="annotationannotationvalue"><strong>--annotation</strong>=<em>annotation=value</em></h4>
+<p>Set an annotation on the entry for the specified image or
+artifact.</p>
+<p>If <strong>--index</strong> is also specified, sets the annotation on
+the entire image index.</p>
+<h4
+id="archarchitecture"><strong>--arch</strong>=<em>architecture</em></h4>
+<p>Override the architecture which the list or index records as a
+requirement for the image. This is usually automatically retrieved from
+the image's configuration information, so it is rarely necessary to use
+this option.</p>
+<h4
+id="featuresfeature"><strong>--features</strong>=<em>feature</em></h4>
+<p>Specify the features list which the list or index records as
+requirements for the image. This option is rarely used.</p>
+<h4 id="index"><strong>--index</strong></h4>
+<p>Treats arguments to the <strong>--annotation</strong> option as
+annotation values to be set on the image index itself rather than on an
+entry in the image index. Implied for <strong>--subject</strong>.</p>
+<h4 id="osos"><strong>--os</strong>=<em>OS</em></h4>
+<p>Override the OS which the list or index records as a requirement for
+the image. This is usually automatically retrieved from the image's
+configuration information, so it is rarely necessary to use this
+option.</p>
+<h4
+id="os-featuresfeature"><strong>--os-features</strong>=<em>feature</em></h4>
+<p>Specify the OS features list which the list or index records as
+requirements for the image. This option is rarely used.</p>
+<h4
+id="os-versionversion"><strong>--os-version</strong>=<em>version</em></h4>
+<p>Specify the OS version which the list or index records as a
+requirement for the image. This option is rarely used.</p>
+<h4
+id="subjectimagename"><strong>--subject</strong>=<em>imageName</em></h4>
+<p>Set the <em>subject</em> field in the image index to mark the image
+index as being associated with the specified image in some way. An image
+index can only be associated with, at most, one subject.</p>
+<h4 id="variant"><strong>--variant</strong></h4>
+<p>Specify the variant which the list or index records for the image.
+This option is typically used to distinguish between multiple entries
+which share the same architecture value, but which expect different
+versions of its instruction set.</p>
+<h2 id="examples">EXAMPLES</h2>
+<p>Update arch and variant information to specified manifest list for
+image:</p>
+<pre><code>podman manifest annotate --arch arm64 --variant v8 mylist:v1.11 sha256:59eec8837a4d942cc19a52b8c09ea75121acc38114a2c68b98983ce9356b8610
+07ec8dc22b5dba3a33c60b68bce28bbd2b905e383fdb32a90708fa5eeac13a07: sha256:59eec8837a4d942cc19a52b8c09ea75121acc38114a2c68b98983ce9356b8610</code></pre>
+<h2 id="see-also">SEE ALSO</h2>
+<p><strong><a href="podman.html">podman(1)</a></strong>, <strong><a
+href="podman-manifest.html">podman-manifest(1)</a></strong></p>
+</body>
+</html>

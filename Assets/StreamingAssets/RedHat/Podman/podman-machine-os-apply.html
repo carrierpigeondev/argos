@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>podman-machine-os-apply 1</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<h2 id="name">NAME</h2>
+<p>podman-machine-os-apply - Apply an OCI image to a Podman Machine's
+OS</p>
+<h2 id="synopsis">SYNOPSIS</h2>
+<p><strong>podman machine os apply</strong> [<em>options</em>]
+<em>image</em> [vm]</p>
+<h2 id="description">DESCRIPTION</h2>
+<p>Apply machine OS changes from an OCI image.</p>
+<p>VM's that use OS's that use rpm-ostreee have the capability to rebase
+itself from the content of an OCI image.
+<code>podman machine image apply</code> takes an OCI image with
+container native ostree functionality and rebases itself on that
+image.</p>
+<p>By default, Podman machines on Mac, Linux, and Windows Hyper-V use a
+customized rpm-ostree based distribution (Fedora CoreOS). Machines based
+on Microsoft WSL use a customized Fedora distribution and cannot be
+updated with this command.</p>
+<p>Note: WSL-based machines are upgradable by using the
+<code>podman machine ssh &lt;machine_name&gt;</code> command followed by
+<code>sudo dnf update</code>. This can, however, result in unexpected
+results in Podman client and server version differences.</p>
+<p>Podman machine images are stored as OCI images at
+<code>quay.io/podman/machine-os</code>. When applying an image using
+this command, the fully qualified OCI reference name must be used
+including tag where the tag is the version of Podman that is inside the
+VM. By default, Podman will attempt to pull only the statement version
+as itself.</p>
+<p>For more information, see the <a
+href="https://coreos.github.io/rpm-ostree/container/">rpm-ostree
+documentation</a>.</p>
+<p>The default machine name is <code>podman-machine-default</code>. If a
+machine name is not specified as an argument, then the OS changes will
+be applied to <code>podman-machine-default</code>.</p>
+<h2 id="options">OPTIONS</h2>
+<h4 id="help"><strong>--help</strong></h4>
+<p>Print usage statement.</p>
+<h4 id="restart"><strong>--restart</strong></h4>
+<p>Restart VM after applying changes.</p>
+<h2 id="examples">EXAMPLES</h2>
+<p>Update the default Podman machine to the latest development version
+of the bootable OCI image.</p>
+<p>Note: This may result in having a newer Podman version inside the
+machine than the client. Unexpected results may occur.</p>
+<p>Update the default Podman machine to the most recent Podman 5.4
+bootable OCI image.</p>
+<pre><code>$ podman machine os apply quay.io/podman/machine-os:5.4</code></pre>
+<p>Update the specified Podman machine to latest Podman 5.3 bootable OCI
+image.</p>
+<pre><code>$ podman machine os apply quay.io/podman/machine-os:5.3 mymachine</code></pre>
+<h2 id="see-also">SEE ALSO</h2>
+<p><strong><a href="podman.html">podman(1)</a></strong>, <strong><a
+href="podman-machine.html">podman-machine(1)</a></strong>, <strong><a
+href="podman-machine-os.html">podman-machine-os(1)</a></strong></p>
+<h2 id="history">HISTORY</h2>
+<p>February 2023, Originally compiled by Ashley Cui <a
+href="mailto:acui@redhat.com" class="email">acui@redhat.com</a></p>
+</body>
+</html>
