@@ -2,9 +2,10 @@ using UnityEngine;
 using Process = System.Diagnostics.Process;
 using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
 
-
 public class PodmanManager : MonoBehaviour
 {
+    public string PodmanPath = System.IO.Path.Combine(Application.streamingAssetsPath, "Redhat", "Podman", "podman.exe");
+
     private void Awake()
     {
         Debug.Log("Setting up Podman...");
@@ -14,39 +15,34 @@ public class PodmanManager : MonoBehaviour
             return;
         }
         Debug.Log("Podman is accessible and ready to use!");
+
     }
 
     private bool IsPodmanAccessible()
     {
-        Process proc = Process.Start(new ProcessStartInfo
+        ProcessStartInfo psi = new ProcessStartInfo
         {
-            FileName = System.IO.Path.Combine(
-                Application.streamingAssetsPath,
-                "Redhat",
-                "Podman",
-                "podman.exe"
-            ),
-            Arguments = "--version",
+            FileName = PodmanPath,
+            ArgumentList = { "--version" },
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
-        });
+        };
 
+        Process proc = Process.Start(psi);
         if (proc == null)
         {
-            Debug.LogError("Failed to start Podman process.");
+            Debug.LogError("Failed to start process.");
             return false;
         }
 
         string stdout = proc.StandardOutput.ReadToEnd();
         string stderr = proc.StandardError.ReadToEnd();
         proc.WaitForExit();
-
-        Debug.Log("Podman Output: " + stdout);
         if (proc.ExitCode != 0)
         {
-            Debug.LogError("Podman Error: " + stderr);
+            Debug.LogError(stderr);
             return false;
         }
 
