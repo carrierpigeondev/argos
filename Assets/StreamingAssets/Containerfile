@@ -7,13 +7,3 @@ RUN chmod +x /usr/local/bin/ttyd
 EXPOSE 7681
 USER dev
 CMD ["ttyd","-i","0.0.0.0","-u","1000","-W","bash"]
-PS C:\Users\Caden\Local\Misc\argoscontainer> cat .\Containerfile
-FROM debian:bookworm-slim
-RUN useradd -u 1000 -m -s /bin/bash dev
-RUN apt-get update && apt-get install curl -y
-RUN curl -L -o /usr/local/bin/ttyd https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64
-RUN chmod +x /usr/local/bin/ttyd
-
-EXPOSE 7681
-USER dev
-CMD ["ttyd","-i","0.0.0.0","-u","1000","-W","bash"]
