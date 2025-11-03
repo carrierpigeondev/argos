@@ -77,8 +77,8 @@ func startContainer() {
 
 func main() {
 	checkVirtualization()
-	makeWSLAccessible()
-	checkPodmanAccessible()
-	makePodmanUsable()
-	startContainer()
+	// makeWSLAccessible()
+	// checkPodmanAccessible()
+	// makePodmanUsable()
+	// startContainer()
 }
