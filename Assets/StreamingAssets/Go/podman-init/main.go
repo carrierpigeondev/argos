@@ -46,7 +46,7 @@ func checkCommandOK(command ...string) int {
 func makeWSLAccessible() {
 	if checkCommandOK("wsl") == -1 {
 		fmt.Println("LOG: Installing WSL... You may need to interact with a prompt...")
-		if checkCommandOK("wsl --install --no-distribution") != 0 {
+		if checkCommandOK("wsl --install") != 0 {
 			fmt.Println("ERR: Could not install WSL")
 			os.Exit(2)
 		}
@@ -77,8 +77,8 @@ func startContainer() {
 
 func main() {
 	checkVirtualization()
-	// makeWSLAccessible()
-	// checkPodmanAccessible()
-	// makePodmanUsable()
-	// startContainer()
+	makeWSLAccessible()
+	checkPodmanAccessible()
+	makePodmanUsable()
+	startContainer()
 }

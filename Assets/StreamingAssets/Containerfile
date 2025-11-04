@@ -1,6 +1,11 @@
 FROM debian:bookworm-slim
+
+RUN apt-get update && apt-get install curl sudo passwd -y
+
 RUN useradd -u 1000 -m -s /bin/bash dev
-RUN apt-get update && apt-get install curl -y
+RUN echo "dev:123" | chpasswd dev
+RUN usermod -aG sudo dev
+
 RUN curl -L -o /usr/local/bin/ttyd https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64
 RUN chmod +x /usr/local/bin/ttyd
 
