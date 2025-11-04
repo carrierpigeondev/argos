@@ -4,7 +4,7 @@ using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
 
 public class PodmanManager : MonoBehaviour
 {
-    public string PodmanPath = System.IO.Path.Combine(Application.streamingAssetsPath, "Redhat", "Podman", "podman.exe");
+    public string PodmanInitPath = System.IO.Path.Combine(Application.streamingAssetsPath, "Go", "podman-init", "podman-init.exe");
 
     private void Awake()
     {
@@ -22,8 +22,7 @@ public class PodmanManager : MonoBehaviour
     {
         ProcessStartInfo psi = new ProcessStartInfo
         {
-            FileName = PodmanPath,
-            ArgumentList = { "--version" },
+            FileName = PodmanInitPath,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
