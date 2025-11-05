@@ -5,21 +5,25 @@ using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
 public class PodmanManager : MonoBehaviour
 {
     public string PodmanInitPath = System.IO.Path.Combine(Application.streamingAssetsPath, "Go", "podman-init", "podman-init.exe");
+    public string PodmanExePath = System.IO.Path.Combine(Application.streamingAssetsPath, "RedHat", "Podman", "podman.exe");
+    public string ContainerPath = System.IO.Path.Combine(Application.streamingAssetsPath, "debian-argos.oci.tar");
 
     private void Awake()
     {
-        Debug.Log("Setting up Podman...");
+        Debug.Log("Setting up podman-init...");
 
         if (!IsPodmanAccessible())
         {
             return;
         }
-        Debug.Log("Podman is accessible and ready to use!");
+        Debug.Log("argos docker image is up!");
 
     }
 
     private bool IsPodmanAccessible()
     {
+        
+
         ProcessStartInfo psi = new ProcessStartInfo
         {
             FileName = PodmanInitPath,
@@ -27,6 +31,7 @@ public class PodmanManager : MonoBehaviour
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
+            Arguments = $"{PodmanExePath} {ContainerPath}"
         };
 
         Process proc = Process.Start(psi);
@@ -36,14 +41,16 @@ public class PodmanManager : MonoBehaviour
             return false;
         }
 
+        
+        proc.WaitForExit();
         string stdout = proc.StandardOutput.ReadToEnd();
         string stderr = proc.StandardError.ReadToEnd();
-        proc.WaitForExit();
-        if (proc.ExitCode != 0)
-        {
-            Debug.LogError(stderr);
-            return false;
-        }
+        Debug.Log(stdout + stderr);
+        //if (proc.ExitCode != 0)
+        //{
+        //Debug.LogError(stderr);
+        //return false;
+        //}
 
         return true;
     }

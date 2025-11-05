@@ -28,6 +28,7 @@ func checkVirtualization() {
 
 func checkCommandOK(command ...string) int {
 	cmd := exec.Command(command[0], command[1:]...)
+	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if out, err := cmd.Output(); err != nil {
 		var exiterr *exec.ExitError
@@ -76,6 +77,11 @@ func startContainer() {
 }
 
 func main() {
+	podmanPath = os.Args[1]
+	containerPath = os.Args[2]
+	fmt.Println(podmanPath)
+	fmt.Println(containerPath)
+
 	checkVirtualization()
 	makeWSLAccessible()
 	checkPodmanAccessible()
