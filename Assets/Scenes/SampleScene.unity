@@ -148,6 +148,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fe24fb2376cdae4798e9b13c3bb3b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PodmanInitPath: 
+  PodmanExePath: 
+  ContainerPath: 
 --- !u!4 &189719939
 Transform:
   m_ObjectHideFlags: 0

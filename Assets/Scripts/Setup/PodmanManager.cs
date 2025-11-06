@@ -4,12 +4,16 @@ using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
 
 public class PodmanManager : MonoBehaviour
 {
-    public string PodmanInitPath = System.IO.Path.Combine(Application.streamingAssetsPath, "Go", "podman-init", "podman-init.exe");
-    public string PodmanExePath = System.IO.Path.Combine(Application.streamingAssetsPath, "RedHat", "Podman", "podman.exe");
-    public string ContainerPath = System.IO.Path.Combine(Application.streamingAssetsPath, "debian-argos.oci.tar");
+    public string PodmanInitPath;
+    public string PodmanExePath;
+    public string ContainerPath;
 
     private void Awake()
     {
+        PodmanInitPath = System.IO.Path.Combine(Application.streamingAssetsPath.Replace("/", "\\"), "Go", "podman-init", "podman-init.exe");
+        PodmanExePath = System.IO.Path.Combine(Application.streamingAssetsPath.Replace("/", "\\"), "RedHat", "Podman", "podman.exe");
+        ContainerPath = System.IO.Path.Combine(Application.streamingAssetsPath.Replace("/", "\\"), "debian-argos.oci.tar");
+
         Debug.Log("Setting up podman-init...");
 
         if (!IsPodmanAccessible())
@@ -22,7 +26,8 @@ public class PodmanManager : MonoBehaviour
 
     private bool IsPodmanAccessible()
     {
-        
+        Debug.Log(PodmanExePath);
+        Debug.Log(ContainerPath);
 
         ProcessStartInfo psi = new ProcessStartInfo
         {
@@ -31,7 +36,7 @@ public class PodmanManager : MonoBehaviour
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
-            Arguments = $"{PodmanExePath} {ContainerPath}"
+            Arguments = $"\"{PodmanExePath}\" \"{ContainerPath}\""
         };
 
         Process proc = Process.Start(psi);
@@ -46,11 +51,11 @@ public class PodmanManager : MonoBehaviour
         string stdout = proc.StandardOutput.ReadToEnd();
         string stderr = proc.StandardError.ReadToEnd();
         Debug.Log(stdout + stderr);
-        //if (proc.ExitCode != 0)
-        //{
-        //Debug.LogError(stderr);
-        //return false;
-        //}
+        if (proc.ExitCode != 0)
+        {
+            Debug.LogError(stderr);
+            return false;
+        }
 
         return true;
     }

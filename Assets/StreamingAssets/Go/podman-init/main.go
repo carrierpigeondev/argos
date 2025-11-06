@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	//"strconv"
 
 	"github.com/klauspost/cpuid/v2"
 )
@@ -28,19 +29,22 @@ func checkVirtualization() {
 
 func checkCommandOK(command ...string) int {
 	cmd := exec.Command(command[0], command[1:]...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if out, err := cmd.Output(); err != nil {
+	fmt.Println(cmd)
+	// cmd.Stdout = os.Stdout
+	// cmd.Stderr = os.Stderr
+	out, err := cmd.Output()
+	if err != nil {
 		var exiterr *exec.ExitError
 		if errors.As(err, &exiterr) {
 			exitcode := exiterr.ExitCode()
-			fmt.Println(string(out), exitcode)
+			fmt.Println("ERR: ", err, exitcode)
 			return exitcode
 		}
 
-		fmt.Println(string(out))
+		fmt.Println("ERR: ", err)
 		return 1
 	}
+	fmt.Println(string(out))
 	return 0
 }
 
@@ -79,12 +83,13 @@ func startContainer() {
 func main() {
 	podmanPath = os.Args[1]
 	containerPath = os.Args[2]
-	fmt.Println(podmanPath)
-	fmt.Println(containerPath)
+	fmt.Printf("podmanPath: {%v}\n", podmanPath)
+	fmt.Printf("containerPath: {%v}\n", containerPath)
 
 	checkVirtualization()
 	makeWSLAccessible()
 	checkPodmanAccessible()
 	makePodmanUsable()
 	startContainer()
+	os.Exit(0)
 }
