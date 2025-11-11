@@ -11,4 +11,4 @@ RUN chmod +x /usr/local/bin/ttyd
 
 EXPOSE 7681
 USER dev
-CMD ["ttyd","-i","0.0.0.0","-u","1000","-W","bash"]
+CMD ["ttyd","-i","0.0.0.0","-u","1000","-t","fontSize=32","-W","bash"]
