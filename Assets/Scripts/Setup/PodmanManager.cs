@@ -46,7 +46,6 @@ public class PodmanManager : MonoBehaviour
             return false;
         }
 
-        
         proc.WaitForExit();
         string stdout = proc.StandardOutput.ReadToEnd();
         string stderr = proc.StandardError.ReadToEnd();
