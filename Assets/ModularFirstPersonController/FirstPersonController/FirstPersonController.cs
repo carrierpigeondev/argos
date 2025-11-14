@@ -9,19 +9,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-using VoltstroStudios.UnityWebBrowser.Shared;
 using VoltstroStudios.UnityWebBrowser.Input;
 
-
-
 #if UNITY_EDITOR
-    using UnityEditor;
+using UnityEditor;
     using System.Net;
 #endif
 
 public class FirstPersonController : MonoBehaviour
 {
     private static readonly KeyCode[] Keymap = (KeyCode[])Enum.GetValues(typeof(KeyCode));
+
+    public WebBrowserOldInputHandler OldInputHandler;
 
     private Rigidbody rb;
 
@@ -214,16 +213,16 @@ public class FirstPersonController : MonoBehaviour
         // Control camera movement
         if(cameraCanMove)
         {
-            yaw = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * mouseSensitivity;
+            yaw = transform.localEulerAngles.y + OldInputHandler.GetAxis("Mouse X") * mouseSensitivity;
 
             if (!invertCamera)
             {
-                pitch -= mouseSensitivity * Input.GetAxis("Mouse Y");
+                pitch -= mouseSensitivity * OldInputHandler.GetAxis("Mouse Y");
             }
             else
             {
                 // Inverted Y
-                pitch += mouseSensitivity * Input.GetAxis("Mouse Y");
+                pitch += mouseSensitivity * OldInputHandler.GetAxis("Mouse Y");
             }
 
             // Clamp pitch between lookAngle
@@ -279,167 +278,9 @@ public class FirstPersonController : MonoBehaviour
         #endregion
         #endregion
 
-        #region Sprint
-
-        if(enableSprint)
-        {
-            if(isSprinting)
-            {
-                isZoomed = false;
-                playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, sprintFOV, sprintFOVStepTime * Time.deltaTime);
-
-                // Drain sprint remaining while sprinting
-                if(!unlimitedSprint)
-                {
-                    sprintRemaining -= 1 * Time.deltaTime;
-                    if (sprintRemaining <= 0)
-                    {
-                        isSprinting = false;
-                        isSprintCooldown = true;
-                    }
-                }
-            }
-            else
-            {
-                // Regain sprint while not sprinting
-                sprintRemaining = Mathf.Clamp(sprintRemaining += 1 * Time.deltaTime, 0, sprintDuration);
-            }
-
-            // Handles sprint cooldown 
-            // When sprint remaining == 0 stops sprint ability until hitting cooldown
-            if(isSprintCooldown)
-            {
-                sprintCooldown -= 1 * Time.deltaTime;
-                if (sprintCooldown <= 0)
-                {
-                    isSprintCooldown = false;
-                }
-            }
-            else
-            {
-                sprintCooldown = sprintCooldownReset;
-            }
-
-            // Handles sprintBar 
-            if(useSprintBar && !unlimitedSprint)
-            {
-                float sprintRemainingPercent = sprintRemaining / sprintDuration;
-                sprintBar.transform.localScale = new Vector3(sprintRemainingPercent, 1f, 1f);
-            }
-        }
-
-        #endregion
-
-        #region Jump
-
-        // Gets input and calls jump method
-        if(enableJump && Input.GetKeyDown(jumpKey) && isGrounded)
-        {
-            Jump();
-        }
-
-        #endregion
-
-        #region Crouch
-
-        if (enableCrouch)
-        {
-            if(Input.GetKeyDown(crouchKey) && !holdToCrouch)
-            {
-                Crouch();
-            }
-            
-            if(Input.GetKeyDown(crouchKey) && holdToCrouch)
-            {
-                isCrouched = false;
-                Crouch();
-            }
-            else if(Input.GetKeyUp(crouchKey) && holdToCrouch)
-            {
-                isCrouched = true;
-                Crouch();
-            }
-        }
-
-        #endregion
-
         CheckGround();
 
-        if(enableHeadBob)
-        {
-            HeadBob();
-        }
-
-        #region WebBrowserInput
-
-
-        foreach (KeyCode key in Keymap)
-        {
-            if (UnityEngine.Input.GetKeyDown(key))
-            {
-                Debug.Log("DOWN" + key.ToString());
-            }
-        }
     }
-
-// THERE NEEDS TO BE A SINGLE SCRIPT THAT HANDLES INPUT, NOT THIS AND WEBBROWSEROLINPUTHANDLER AS WELL
-// NEED TO FIXXXXXXXX
-    public WindowsKey[] GetDownKeys()
-    {
-        List<WindowsKey> keysDown = new();
-
-        foreach (KeyCode key in Keymap)
-        {
-            //Why are mouse buttons considered key codes???
-            if (key is KeyCode.Mouse0 or KeyCode.Mouse1 or KeyCode.Mouse2 or KeyCode.Mouse3 or KeyCode.Mouse4
-                or KeyCode.Mouse5 or KeyCode.Mouse6)
-                continue;
-
-            try
-            {
-                if (UnityEngine.Input.GetKeyDown(key))
-                {
-                    Debug.Log("DOWN" + key.ToString());
-                    keysDown.Add(key.UnityKeyCodeToWindowKey());
-                }
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                //Safe to ignore
-            }
-        }
-
-        return keysDown.ToArray();
-    }
-
-    public WindowsKey[] GetUpKeys()
-    {
-        List<WindowsKey> keysUp = new();
-
-        foreach (KeyCode key in Keymap)
-        {
-            //Why are mouse buttons considered key codes???
-            if (key is KeyCode.Mouse0 or KeyCode.Mouse1 or KeyCode.Mouse2 or KeyCode.Mouse3 or KeyCode.Mouse4
-                or KeyCode.Mouse5 or KeyCode.Mouse6)
-                continue;
-
-            try
-            {
-                if (UnityEngine.Input.GetKeyUp(key))
-                {
-                    Debug.Log("UP" + key.ToString());
-                    keysUp.Add(key.UnityKeyCodeToWindowKey());
-                }
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                //Safe to ignore
-            }
-        }
-
-        return keysUp.ToArray();
-    }
-
 
     void FixedUpdate()
     {
@@ -448,7 +289,9 @@ public class FirstPersonController : MonoBehaviour
         if (playerCanMove)
         {
             // Calculate how fast we should be moving
-            Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            float horizontalAxis = OldInputHandler.GetAxis("Horizontal");
+            float verticalAxis = OldInputHandler.GetAxis("Horizontal");
+            Vector3 targetVelocity = new Vector3(horizontalAxis, 0, verticalAxis);
 
             // Checks if player is walking and isGrounded
             // Will allow head bob
@@ -461,40 +304,6 @@ public class FirstPersonController : MonoBehaviour
                 isWalking = false;
             }
 
-            // All movement calculations shile sprint is active
-            if (enableSprint && Input.GetKey(sprintKey) && sprintRemaining > 0f && !isSprintCooldown)
-            {
-                targetVelocity = transform.TransformDirection(targetVelocity) * sprintSpeed;
-
-                // Apply a force that attempts to reach our target velocity
-                Vector3 velocity = rb.linearVelocity;
-                Vector3 velocityChange = (targetVelocity - velocity);
-                velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
-                velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
-                velocityChange.y = 0;
-
-                // Player is only moving when valocity change != 0
-                // Makes sure fov change only happens during movement
-                if (velocityChange.x != 0 || velocityChange.z != 0)
-                {
-                    isSprinting = true;
-
-                    if (isCrouched)
-                    {
-                        Crouch();
-                    }
-
-                    if (hideBarWhenFull && !unlimitedSprint)
-                    {
-                        sprintBarCG.alpha += 5 * Time.deltaTime;
-                    }
-                }
-
-                rb.AddForce(velocityChange, ForceMode.VelocityChange);
-            }
-            // All movement calculations while walking
-            else
-            {
                 isSprinting = false;
 
                 if (hideBarWhenFull && sprintRemaining == sprintDuration)
@@ -512,7 +321,6 @@ public class FirstPersonController : MonoBehaviour
                 velocityChange.y = 0;
 
                 rb.AddForce(velocityChange, ForceMode.VelocityChange);
-            }
         }
 
         #endregion
@@ -533,74 +341,6 @@ public class FirstPersonController : MonoBehaviour
         else
         {
             isGrounded = false;
-        }
-    }
-
-    private void Jump()
-    {
-        // Adds force to the player rigidbody to jump
-        if (isGrounded)
-        {
-            rb.AddForce(0f, jumpPower, 0f, ForceMode.Impulse);
-            isGrounded = false;
-        }
-
-        // When crouched and using toggle system, will uncrouch for a jump
-        if(isCrouched && !holdToCrouch)
-        {
-            Crouch();
-        }
-    }
-
-    private void Crouch()
-    {
-        // Stands player up to full height
-        // Brings walkSpeed back up to original speed
-        if(isCrouched)
-        {
-            transform.localScale = new Vector3(originalScale.x, originalScale.y, originalScale.z);
-            walkSpeed /= speedReduction;
-
-            isCrouched = false;
-        }
-        // Crouches player down to set height
-        // Reduces walkSpeed
-        else
-        {
-            transform.localScale = new Vector3(originalScale.x, crouchHeight, originalScale.z);
-            walkSpeed *= speedReduction;
-
-            isCrouched = true;
-        }
-    }
-
-    private void HeadBob()
-    {
-        if(isWalking)
-        {
-            // Calculates HeadBob speed during sprint
-            if(isSprinting)
-            {
-                timer += Time.deltaTime * (bobSpeed + sprintSpeed);
-            }
-            // Calculates HeadBob speed during crouched movement
-            else if (isCrouched)
-            {
-                timer += Time.deltaTime * (bobSpeed * speedReduction);
-            }
-            // Calculates HeadBob speed during walking
-            else
-            {
-                timer += Time.deltaTime * bobSpeed;
-            }
-            // Applies HeadBob movement
-            joint.localPosition = new Vector3(jointOriginalPos.x + Mathf.Sin(timer) * bobAmount.x, jointOriginalPos.y + Mathf.Sin(timer) * bobAmount.y, jointOriginalPos.z + Mathf.Sin(timer) * bobAmount.z);
-        }
-        else
-        {
-            // Resets when play stops moving
-            timer = 0;
-            joint.localPosition = new Vector3(Mathf.Lerp(joint.localPosition.x, jointOriginalPos.x, Time.deltaTime * bobSpeed), Mathf.Lerp(joint.localPosition.y, jointOriginalPos.y, Time.deltaTime * bobSpeed), Mathf.Lerp(joint.localPosition.z, jointOriginalPos.z, Time.deltaTime * bobSpeed));
         }
     }
 }
