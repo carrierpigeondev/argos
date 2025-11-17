@@ -8,8 +8,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
-using VoltstroStudios.UnityWebBrowser.Input;
+using VoltstroStudios.UnityWebBrowser;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -18,11 +18,9 @@ using UnityEditor;
 
 public class FirstPersonController : MonoBehaviour
 {
-    private static readonly KeyCode[] Keymap = (KeyCode[])Enum.GetValues(typeof(KeyCode));
-
-    public WebBrowserOldInputHandler OldInputHandler;
-
     private Rigidbody rb;
+
+    public WebBrowserUIFull Wbuf;
 
     #region Camera Movement Variables
 
@@ -139,6 +137,9 @@ public class FirstPersonController : MonoBehaviour
 
     private void Awake()
     {
+        Wbuf = GameObject.Find("Screen").GetComponent<WebBrowserUIFull>();
+        Debug.Log(Wbuf.name);
+
         rb = GetComponent<Rigidbody>();
 
         crosshairObject = GetComponentInChildren<Image>();
@@ -157,10 +158,10 @@ public class FirstPersonController : MonoBehaviour
 
     void Start()
     {
-        if(lockCursor)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-        }
+        //if(lockCursor)
+        //{
+        //    Cursor.lockState = CursorLockMode.Locked;
+        //}
 
         if(crosshair)
         {
@@ -208,21 +209,19 @@ public class FirstPersonController : MonoBehaviour
 
     private void Update()
     {
-        #region Camera
-
-        // Control camera movement
-        if(cameraCanMove)
+        
+        if (cameraCanMove)
         {
-            yaw = transform.localEulerAngles.y + OldInputHandler.GetAxis("Mouse X") * mouseSensitivity;
+            yaw = transform.localEulerAngles.y + Wbuf.inputHandler.GetAxis("Mouse X") * mouseSensitivity;
 
             if (!invertCamera)
             {
-                pitch -= mouseSensitivity * OldInputHandler.GetAxis("Mouse Y");
+                pitch -= mouseSensitivity * Wbuf.inputHandler.GetAxis("Mouse Y");
             }
             else
             {
                 // Inverted Y
-                pitch += mouseSensitivity * OldInputHandler.GetAxis("Mouse Y");
+                pitch += mouseSensitivity * Wbuf.inputHandler.GetAxis("Mouse Y");
             }
 
             // Clamp pitch between lookAngle
@@ -231,55 +230,6 @@ public class FirstPersonController : MonoBehaviour
             transform.localEulerAngles = new Vector3(0, yaw, 0);
             playerCamera.transform.localEulerAngles = new Vector3(pitch, 0, 0);
         }
-
-        #region Camera Zoom
-
-        if (enableZoom)
-        {
-            // Changes isZoomed when key is pressed
-            // Behavior for toogle zoom
-            if(Input.GetKeyDown(zoomKey) && !holdToZoom && !isSprinting)
-            {
-                if (!isZoomed)
-                {
-                    isZoomed = true;
-                }
-                else
-                {
-                    isZoomed = false;
-                }
-            }
-
-            // Changes isZoomed when key is pressed
-            // Behavior for hold to zoom
-            if(holdToZoom && !isSprinting)
-            {
-                if(Input.GetKeyDown(zoomKey))
-                {
-                    isZoomed = true;
-                }
-                else if(Input.GetKeyUp(zoomKey))
-                {
-                    isZoomed = false;
-                }
-            }
-
-            // Lerps camera.fieldOfView to allow for a smooth transistion
-            if(isZoomed)
-            {
-                playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, zoomFOV, zoomStepTime * Time.deltaTime);
-            }
-            else if(!isZoomed && !isSprinting)
-            {
-                playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, fov, zoomStepTime * Time.deltaTime);
-            }
-        }
-
-        #endregion
-        #endregion
-
-        CheckGround();
-
     }
 
     void FixedUpdate()
@@ -289,9 +239,7 @@ public class FirstPersonController : MonoBehaviour
         if (playerCanMove)
         {
             // Calculate how fast we should be moving
-            float horizontalAxis = OldInputHandler.GetAxis("Horizontal");
-            float verticalAxis = OldInputHandler.GetAxis("Horizontal");
-            Vector3 targetVelocity = new Vector3(horizontalAxis, 0, verticalAxis);
+            Vector3 targetVelocity = new Vector3(Wbuf.inputHandler.GetAxis("Horizontal"), 0, Wbuf.inputHandler.GetAxis("Vertical"));
 
             // Checks if player is walking and isGrounded
             // Will allow head bob
@@ -304,23 +252,24 @@ public class FirstPersonController : MonoBehaviour
                 isWalking = false;
             }
 
-                isSprinting = false;
+            isSprinting = false;
 
-                if (hideBarWhenFull && sprintRemaining == sprintDuration)
-                {
-                    sprintBarCG.alpha -= 3 * Time.deltaTime;
-                }
+            if (hideBarWhenFull && sprintRemaining == sprintDuration)
+            {
+                sprintBarCG.alpha -= 3 * Time.deltaTime;
+            }
 
-                targetVelocity = transform.TransformDirection(targetVelocity) * walkSpeed;
+            targetVelocity = transform.TransformDirection(targetVelocity) * walkSpeed;
 
-                // Apply a force that attempts to reach our target velocity
-                Vector3 velocity = rb.linearVelocity;
-                Vector3 velocityChange = (targetVelocity - velocity);
-                velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
-                velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
-                velocityChange.y = 0;
+            // Apply a force that attempts to reach our target velocity
+            Vector3 velocity = rb.linearVelocity;
+            Vector3 velocityChange = (targetVelocity - velocity);
+            velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
+            velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
+            velocityChange.y = 0;
 
-                rb.AddForce(velocityChange, ForceMode.VelocityChange);
+            rb.AddForce(velocityChange, ForceMode.VelocityChange);
+
         }
 
         #endregion
