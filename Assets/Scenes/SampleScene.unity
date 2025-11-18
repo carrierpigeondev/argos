@@ -652,7 +652,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a019949a60ecb9a48ab72f00a278b091, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DetectionRadius: 0
+  DetectionRadius: 10
   RawImg: {fileID: 0}
 --- !u!1 &701762250 stripped
 GameObject:
@@ -843,6 +843,7 @@ GameObject:
   - component: {fileID: 1579144368}
   - component: {fileID: 1579144367}
   - component: {fileID: 1579144366}
+  - component: {fileID: 1579144369}
   m_Layer: 5
   m_Name: Screen
   m_TagString: Untagged
@@ -953,6 +954,27 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1579144364}
   m_CullTransparentMesh: 1
+--- !u!65 &1579144369
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1579144364}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &2061824320
 PrefabInstance:
   m_ObjectHideFlags: 0
