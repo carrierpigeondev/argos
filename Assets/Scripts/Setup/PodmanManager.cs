@@ -14,20 +14,20 @@ public class PodmanManager : MonoBehaviour
         PodmanExePath = System.IO.Path.Combine(Application.streamingAssetsPath.Replace("/", "\\"), "RedHat", "Podman", "podman.exe");
         ContainerPath = System.IO.Path.Combine(Application.streamingAssetsPath.Replace("/", "\\"), "debian-argos.oci.tar");
 
-        Debug.Log("Setting up podman-init...");
+        Debug.Log("[Unity Podman Initializer]: Setting up podman-init...");
 
         if (!IsPodmanAccessible())
         {
             return;
         }
-        Debug.Log("argos docker image is up!");
+        Debug.Log("[Unity Podman Initializer]: A.R.G.O.S. docker image is up!");
 
     }
 
     private bool IsPodmanAccessible()
     {
-        Debug.Log(PodmanExePath);
-        Debug.Log(ContainerPath);
+        Debug.Log($"[Unity Podman Initializer]: Podman executable path: {PodmanExePath}");
+        Debug.Log($"[Unity Podman Initializer]: Container oci.tar path: {ContainerPath}");
 
         ProcessStartInfo psi = new ProcessStartInfo
         {
@@ -42,17 +42,17 @@ public class PodmanManager : MonoBehaviour
         Process proc = Process.Start(psi);
         if (proc == null)
         {
-            Debug.LogError("Failed to start process.");
+            Debug.LogError("[Unity Podman Initializer]: Failed to start process.");
             return false;
         }
 
         proc.WaitForExit();
         string stdout = proc.StandardOutput.ReadToEnd();
         string stderr = proc.StandardError.ReadToEnd();
-        Debug.Log(stdout + stderr);
+        Debug.Log($"[podman-init]: {stdout + stderr}");
         if (proc.ExitCode != 0)
         {
-            Debug.LogError(stderr);
+            Debug.Log($"[podman-init]: {stderr}");
             return false;
         }
 
