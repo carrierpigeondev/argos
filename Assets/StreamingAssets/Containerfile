@@ -11,15 +11,15 @@ RUN chown dev:dev /home/dev/bin
 RUN curl -L -o /usr/local/bin/ttyd https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64
 RUN chmod +x /usr/local/bin/ttyd
 
-RUN curl -L -o /usr/local/bin/install-fun https://raw.githubusercontent.com/carrierpigeondev/argos-remote/refs/heads/main/install-fun
-RUN chmod +x /usr/local/bin/install-fun
-
 RUN echo '#!/bin/bash' > /usr/local/bin/entrypoint.sh && \
     echo 'set -e' >> /usr/local/bin/entrypoint.sh && \
-    echo 'curl -L -o /home/dev/bin/install-fun "https://raw.githubusercontent.com/carrierpigeondev/argos-remote/refs/heads/main/install-fun"' >> /usr/local/bin/entrypoint.sh && \
-    echo 'chmod +x /home/dev/bin/install-fun' >> /usr/local/bin/entrypoint.sh && \
+    echo 'curl -L -o /home/dev/bin/custom-setup "https://raw.githubusercontent.com/carrierpigeondev/argos-remote/refs/heads/main/custom-setup.sh"' >> /usr/local/bin/entrypoint.sh && \
+    echo 'chmod +x /home/dev/bin/custom-setup' >> /usr/local/bin/entrypoint.sh && \
     echo 'exec ttyd -i 0.0.0.0 -u 1000 -t fontSize=32 -W bash' >> /usr/local/bin/entrypoint.sh && \
+    echo 'set -a; source /etc/environment; set +a;' >> /usr/local/bin/entrypoint.sh && \
     chmod +x /usr/local/bin/entrypoint.sh
+
+RUN echo 'export PATH=/home/dev/bin:$PATH' >> /etc/environment
 
 EXPOSE 7681
 USER dev
