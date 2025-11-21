@@ -1,25 +1,34 @@
 FROM debian:trixie-slim
 
+# install necessary packages
+# * curl - allows to download non-apt programs
+# * sudo - to... sudo
+# * passwd - to set passwd for dev user
 RUN apt-get update && apt-get install curl sudo passwd -y
 
+# setup dev user
 RUN useradd -u 1000 -m -s /bin/bash dev
 RUN echo "dev:123" | chpasswd
 RUN usermod -aG sudo dev
 RUN mkdir -p /home/dev/bin
 RUN chown dev:dev /home/dev/bin
 
+# install ttyd
 RUN curl -L -o /usr/local/bin/ttyd https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64
 RUN chmod +x /usr/local/bin/ttyd
 
+# setup path for dev and sudo
+ENV PATH="/home/dev/bin:$PATH"
+RUN echo 'Defaults secure_path="/home/dev/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' > /etc/sudoers.d/dev-path
+RUN chmod 440 /etc/sudoers.d/dev-path
+
+# create entrypoint script to download custom-setup and exec ttyd on container start
 RUN echo '#!/bin/bash' > /usr/local/bin/entrypoint.sh && \
     echo 'set -e' >> /usr/local/bin/entrypoint.sh && \
     echo 'curl -L -o /home/dev/bin/custom-setup "https://raw.githubusercontent.com/carrierpigeondev/argos-remote/refs/heads/main/custom-setup.sh"' >> /usr/local/bin/entrypoint.sh && \
     echo 'chmod +x /home/dev/bin/custom-setup' >> /usr/local/bin/entrypoint.sh && \
     echo 'exec ttyd -i 0.0.0.0 -u 1000 -t fontSize=32 -W bash' >> /usr/local/bin/entrypoint.sh && \
-    echo 'set -a; source /etc/environment; set +a;' >> /usr/local/bin/entrypoint.sh && \
     chmod +x /usr/local/bin/entrypoint.sh
-
-RUN echo 'export PATH=/home/dev/bin:$PATH' >> /etc/environment
 
 EXPOSE 7681
 USER dev
