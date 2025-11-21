@@ -20,7 +20,7 @@ public class PodmanManager : MonoBehaviour
         {
             return;
         }
-        Debug.Log("[Unity Podman Initializer]: A.R.G.O.S. docker image is up!");
+        Debug.Log("[Unity Podman Initializer]: A.R.G.O.S. podman image is up!");
 
     }
 
