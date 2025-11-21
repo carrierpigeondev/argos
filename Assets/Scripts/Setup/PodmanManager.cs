@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine;
 using Process = System.Diagnostics.Process;
 using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
@@ -8,7 +9,10 @@ public class PodmanManager : MonoBehaviour
     public string PodmanExePath;
     public string ContainerPath;
 
-    private void Awake()
+    public bool PodmanHasBeenChecked = false;
+    public bool PodmanAccessible = false;
+
+    private async void Awake()
     {
         PodmanInitPath = System.IO.Path.Combine(Application.streamingAssetsPath.Replace("/", "\\"), "Go", "podman-init", "podman-init.exe");
         PodmanExePath = System.IO.Path.Combine(Application.streamingAssetsPath.Replace("/", "\\"), "RedHat", "Podman", "podman.exe");
@@ -16,12 +20,17 @@ public class PodmanManager : MonoBehaviour
 
         Debug.Log("[Unity Podman Initializer]: Setting up podman-init...");
 
-        if (!IsPodmanAccessible())
-        {
-            return;
-        }
-        Debug.Log("[Unity Podman Initializer]: A.R.G.O.S. podman image is up!");
+        PodmanAccessible = await Task.Run(IsPodmanAccessible);
+        PodmanHasBeenChecked = true;
 
+        if (PodmanAccessible)
+        {
+            Debug.Log("[Unity Podman Initializer]: A.R.G.O.S. podman image is up!");
+        }
+        else
+        {
+            Debug.LogError("[Unity Podman Initializer]: A.R.G.O.S podman image could not be set up. Maybe check podman logs?");
+        }
     }
 
     private bool IsPodmanAccessible()

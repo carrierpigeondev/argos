@@ -8,6 +8,7 @@ public class ToggleNearestScreen : MonoBehaviour
     public float DetectionRadius;
     public RawImage RawImg;
     public FirstPersonController Fpc;
+    public PodmanManager Pm;
 
     void Update()
     {
