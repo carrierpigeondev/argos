@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 189719939}
   - component: {fileID: 189719938}
+  - component: {fileID: 189719940}
   m_Layer: 0
   m_Name: Setup Manager
   m_TagString: Untagged
@@ -168,6 +169,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &189719940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 189719937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29d47cef4a338a9459730d24053a1750, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -1116,6 +1129,7 @@ MonoBehaviour:
   rawImage: {fileID: 1579144367}
   BootTexture: {fileID: 2800000, guid: 7e8861ec01b370b4f973b259e46df78e, type: 3}
   ErrorTexture: {fileID: 2800000, guid: 585b1d25c26eb324a8d95a18a1ae8c31, type: 3}
+  EventSystem: {fileID: 900881894}
   Pm: {fileID: 189719938}
 --- !u!1001 &2061824320
 PrefabInstance:

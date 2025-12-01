@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using VoltstroStudios.UnityWebBrowser;
 using VoltstroStudios.UnityWebBrowser.Core;
@@ -12,9 +13,12 @@ public class ScreenImageHandler : MonoBehaviour
     public Texture BootTexture;
     public Texture ErrorTexture;
 
+    public EventSystem EventSystem;
+
     public PodmanManager Pm;
 
     private bool pageLoaded = false;
+    
 
     private void Start()
     {
@@ -36,6 +40,9 @@ public class ScreenImageHandler : MonoBehaviour
         }
 
         pageLoaded = true;
+
+        PointerEventData fakeData = new(EventSystem);
+        browserUIFull.OnPointerEnter(fakeData);  // fake a call OnPointerEnter so that the BrowserUI (RawImageUwbClientInputHandler) recognizes keyboard inputs 
     }
 
     private void Update()
