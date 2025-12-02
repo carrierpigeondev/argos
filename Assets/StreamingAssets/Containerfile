@@ -22,14 +22,14 @@ ENV PATH="/home/dev/bin:$PATH"
 RUN echo 'Defaults secure_path="/home/dev/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' > /etc/sudoers.d/dev-path
 RUN chmod 440 /etc/sudoers.d/dev-path
 
-# create entrypoint script to download custom-setup and exec ttyd on container start
-RUN echo '#!/bin/bash' > /usr/local/bin/entrypoint.sh && \
-    echo 'set -e' >> /usr/local/bin/entrypoint.sh && \
-    echo 'curl -L -o /home/dev/bin/custom-setup "https://raw.githubusercontent.com/carrierpigeondev/argos-remote/refs/heads/main/custom-setup.sh"' >> /usr/local/bin/entrypoint.sh && \
-    echo 'chmod +x /home/dev/bin/custom-setup' >> /usr/local/bin/entrypoint.sh && \
-    echo 'exec ttyd -i 0.0.0.0 -u 1000 -t fontSize=32 -W bash' >> /usr/local/bin/entrypoint.sh && \
-    chmod +x /usr/local/bin/entrypoint.sh
+# create entrypoint_1 script to download custom-setup and exec ttyd on container start
+RUN echo '#!/bin/bash' > /usr/local/bin/entrypoint_1.sh && \
+    echo 'set -e' >> /usr/local/bin/entrypoint_1.sh && \
+    echo 'curl -L -o /home/dev/bin/custom-setup "https://raw.githubusercontent.com/carrierpigeondev/argos-remote/refs/heads/main/custom-setup.sh"' >> /usr/local/bin/entrypoint_1.sh && \
+    echo 'chmod +x /home/dev/bin/custom-setup' >> /usr/local/bin/entrypoint_1.sh && \
+    echo 'exec ttyd -i 0.0.0.0 -u 1000 -t fontSize=32 -W bash' >> /usr/local/bin/entrypoint_1.sh && \
+    chmod +x /usr/local/bin/entrypoint_1.sh
 
 EXPOSE 7681
 USER dev
-CMD ["/usr/local/bin/entrypoint.sh"]
+CMD ["/usr/local/bin/entrypoint_1.sh"]
