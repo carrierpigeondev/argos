@@ -1,14 +1,17 @@
 using System;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using VoltstroStudios.UnityWebBrowser;
 
 public class ToggleNearestScreen : MonoBehaviour
 {
     public float DetectionRadius;
     public RawImage RawImg;
     public FirstPersonController Fpc;
-    public PodmanManager Pm;
+    public EventSystem EventSystem;
+    public WebBrowserUIFull browserUIFull;
 
     void Update()
     {

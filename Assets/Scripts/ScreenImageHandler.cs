@@ -41,6 +41,7 @@ public class ScreenImageHandler : MonoBehaviour
 
         pageLoaded = true;
 
+        Debug.Log("INFO INFO INFO INFO INFO; FAKING EVENT");
         PointerEventData fakeData = new(EventSystem);
         browserUIFull.OnPointerEnter(fakeData);  // fake a call OnPointerEnter so that the BrowserUI (RawImageUwbClientInputHandler) recognizes keyboard inputs 
     }
