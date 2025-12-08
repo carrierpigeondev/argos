@@ -7,7 +7,7 @@ using VoltstroStudios.UnityWebBrowser.Core;
 
 public class ScreenImageHandler : MonoBehaviour
 {
-    public WebBrowserUIFull browserUIFull;
+    public WebBrowserUIFull BrowserUIFull;
 
     public RawImage rawImage;
     public Texture BootTexture;
@@ -17,13 +17,16 @@ public class ScreenImageHandler : MonoBehaviour
 
     public PodmanManager Pm;
 
-    private bool pageLoaded = false;
-    
+    public bool PageLoaded = false;
+
+    public bool setTexture = false;
+
+
 
     private void Start()
     {
-        browserUIFull = GetComponent<WebBrowserUIFull>();
-        browserUIFull.browserClient.OnLoadFinish += OnLoadFinish;
+        BrowserUIFull = GetComponent<WebBrowserUIFull>();
+        BrowserUIFull.browserClient.OnLoadFinish += OnLoadFinish;
     }
 
     private void OnLoadFinish(string url)
@@ -34,16 +37,16 @@ public class ScreenImageHandler : MonoBehaviour
     private IEnumerator PageIsLoaded()
     {
         yield return new WaitForSeconds(1f);
-        while (browserUIFull.browserClient.BrowserTexture == null)
+        while (BrowserUIFull.browserClient.BrowserTexture == null)
         {
             yield return null;
         }
 
-        pageLoaded = true;
+        PageLoaded = true;
 
         Debug.Log("INFO INFO INFO INFO INFO; FAKING EVENT");
-        PointerEventData fakeData = new(EventSystem);
-        browserUIFull.OnPointerEnter(fakeData);  // fake a call OnPointerEnter so that the BrowserUI (RawImageUwbClientInputHandler) recognizes keyboard inputs 
+        //PointerEventData fakeData = new(EventSystem);
+        //BrowserUIFull.OnPointerEnter(fakeData);  // fake a call OnPointerEnter so that the BrowserUI (RawImageUwbClientInputHandler) recognizes keyboard inputs 
     }
 
     private void Update()
@@ -52,13 +55,17 @@ public class ScreenImageHandler : MonoBehaviour
         {
             if (Pm.PodmanAccessible)
             {
-                Debug.Log("[ScreenImageHandler]: Podman is accessible, showing browser texture.");
-                rawImage.color = Color.black;
-                browserUIFull.enabled = true;  // only enable here so that the browser doesn't try to load before podman is up, thus not needing manual refresh
-                if (pageLoaded)
+                //Debug.Log("[ScreenImageHandler]: Podman is accessible, showing browser texture.");
+                BrowserUIFull.enabled = true;  // only enable here so that the browser doesn't try to load before podman is up, thus not needing manual refresh
+                if (PageLoaded)
                 {
-                    rawImage.texture = browserUIFull.browserClient.BrowserTexture;
-                    rawImage.color = Color.white;
+                    if (!setTexture)
+                    {
+                        setTexture = true;
+                        rawImage.texture = BrowserUIFull.browserClient.BrowserTexture;
+                        rawImage.color = Color.white;
+                    }
+                    
                 } else
                 {
                     rawImage.texture = BootTexture;

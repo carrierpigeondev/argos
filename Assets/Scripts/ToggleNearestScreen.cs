@@ -25,10 +25,18 @@ public class ToggleNearestScreen : MonoBehaviour
         {
             if (RawImg)
             {
-                RawImg.enabled = true;
-                Cursor.lockState = CursorLockMode.None;
-                Fpc.cameraCanMove = false;
-                Fpc.playerCanMove = false;
+                if (RawImg.transform.GetComponent<ScreenImageHandler>().PageLoaded)
+                {
+                    RawImg.enabled = true;
+                    Cursor.lockState = CursorLockMode.None;
+                    Fpc.cameraCanMove = false;
+                    Fpc.playerCanMove = false;
+                }
+                else
+                {
+                    Debug.Log("Page not loaded; cannot open!!!");
+                }
+
             }
         }
 
