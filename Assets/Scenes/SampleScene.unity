@@ -668,7 +668,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DetectionRadius: 10
-  RawImg: {fileID: 0}
+  RawImg: {fileID: 1579144367}
   Fpc: {fileID: 641925901}
   EventSystem: {fileID: 900881894}
   browserUIFull: {fileID: 1579144366}
@@ -1126,12 +1126,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff800bf1ab0119e4587b341f68930705, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  browserUIFull: {fileID: 0}
+  BrowserUIFull: {fileID: 0}
   rawImage: {fileID: 1579144367}
   BootTexture: {fileID: 2800000, guid: 7e8861ec01b370b4f973b259e46df78e, type: 3}
   ErrorTexture: {fileID: 2800000, guid: 585b1d25c26eb324a8d95a18a1ae8c31, type: 3}
   EventSystem: {fileID: 900881894}
   Pm: {fileID: 189719938}
+  PageLoaded: 0
+  setTexture: 0
 --- !u!1001 &2061824320
 PrefabInstance:
   m_ObjectHideFlags: 0
