@@ -27,15 +27,15 @@ public class ToggleNearestScreen : MonoBehaviour
                 RawImg.enabled = true;
                 RawImg.transform.GetComponent<WebBrowserUIFull>().disableKeyboardInputs = false;
                 var webui = RawImg.transform.GetComponent<WebBrowserUIFull>();
-                if (webui.keyboardAndMouseHandlerCoroutine == null)
-                {
-                    webui.keyboardAndMouseHandlerCoroutine = StartCoroutine(webui.KeyboardAndMouseHandler());
-                } else
-                {
-                    Debug.Log(webui.keyboardAndMouseHandlerCoroutine.ToString());
-                    Debug.Log("not gonna start bc there is already something, haha loser.");
-                }
-                    Cursor.lockState = CursorLockMode.None;
+                //if (webui.keyboardAndMouseHandlerCoroutine == null)
+                //{
+                //    webui.keyboardAndMouseHandlerCoroutine = StartCoroutine(webui.KeyboardAndMouseHandler());
+                //} else
+                //{
+                //    Debug.Log(webui.keyboardAndMouseHandlerCoroutine.ToString());
+                //    Debug.Log("not gonna start bc there is already something, haha loser.");
+                //}
+                Cursor.lockState = CursorLockMode.None;
                 Fpc.cameraCanMove = false;
                 Fpc.playerCanMove = false;
             }
@@ -45,12 +45,12 @@ public class ToggleNearestScreen : MonoBehaviour
             }
         }
 
-        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftAlt) && Input.GetKey(KeyCode.Insert))
+        if (Input.GetKeyDown(KeyCode.F1))
         {
             RawImg.enabled = false;
             RawImg.transform.GetComponent<WebBrowserUIFull>().disableKeyboardInputs = true;
             var webui = RawImg.transform.GetComponent<WebBrowserUIFull>();
-            StopCoroutine(webui.keyboardAndMouseHandlerCoroutine);
+            //StopCoroutine(webui.keyboardAndMouseHandlerCoroutine);
             Cursor.lockState = CursorLockMode.Locked;
             Fpc.cameraCanMove = true;
             Fpc.playerCanMove = true;
