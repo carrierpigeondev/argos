@@ -21,6 +21,8 @@ public class ScreenImageHandler : MonoBehaviour
 
     public bool setTexture = false;
 
+    public GameObject DisplayObject;
+
 
 
     private void Start()
@@ -51,6 +53,8 @@ public class ScreenImageHandler : MonoBehaviour
 
     private void Update()
     {
+        UpdateDisplayObjectTexture();
+
         if (Pm.PodmanHasBeenChecked)
         {
             if (Pm.PodmanAccessible)
@@ -63,6 +67,11 @@ public class ScreenImageHandler : MonoBehaviour
                     {
                         setTexture = true;
                         rawImage.texture = BrowserUIFull.browserClient.BrowserTexture;
+                        if (DisplayObject.GetComponent<Transform>().localRotation != Quaternion.identity)
+                        {
+                            DisplayObject.GetComponent<Transform>().localRotation = Quaternion.Euler(0f, 0f, 0f);
+                            DisplayObject.GetComponent<Transform>().localScale = new Vector3(-0.8f, 0.45f, 0.01f);
+                        }
                         rawImage.color = Color.white;
                     }
                     
@@ -81,5 +90,10 @@ public class ScreenImageHandler : MonoBehaviour
             Debug.Log("[ScreenImageHandler]: Podman has not been checked yet, showing boot texture.");
             rawImage.texture = BootTexture;
         }
+    }
+
+    private void UpdateDisplayObjectTexture()
+    {
+        DisplayObject.GetComponent<Renderer>().material.mainTexture = rawImage.texture;
     }
 }
