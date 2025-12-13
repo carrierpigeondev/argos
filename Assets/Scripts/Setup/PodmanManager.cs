@@ -35,36 +35,43 @@ public class PodmanManager : MonoBehaviour
 
     private bool IsPodmanAccessible()
     {
-        Debug.Log($"[Unity Podman Initializer]: Podman executable path: {PodmanExePath}");
-        Debug.Log($"[Unity Podman Initializer]: Container oci.tar path: {ContainerPath}");
-
-        ProcessStartInfo psi = new ProcessStartInfo
+        try
         {
-            FileName = PodmanInitPath,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            Arguments = $"\"{PodmanExePath}\" \"{ContainerPath}\""
-        };
+            Debug.Log($"[Unity Podman Initializer]: Podman executable path: {PodmanExePath}");
+            Debug.Log($"[Unity Podman Initializer]: Container oci.tar path: {ContainerPath}");
 
-        Process proc = Process.Start(psi);
-        if (proc == null)
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                FileName = PodmanInitPath,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                Arguments = $"\"{PodmanExePath}\" \"{ContainerPath}\""
+            };
+
+            Process proc = Process.Start(psi);
+            if (proc == null)
+            {
+                Debug.LogError("[Unity Podman Initializer]: Failed to start process.");
+                return false;
+            }
+
+            proc.WaitForExit();
+            string stdout = proc.StandardOutput.ReadToEnd();
+            string stderr = proc.StandardError.ReadToEnd();
+            Debug.Log($"[podman-init]: {stdout + stderr}");
+            if (proc.ExitCode != 0)
+            {
+                Debug.Log($"[podman-init]: {stderr}");
+                return false;
+            }
+
+            return true;
+        } catch (System.Exception ex)
         {
-            Debug.LogError("[Unity Podman Initializer]: Failed to start process.");
+            Debug.LogError($"[Unity Podman Initializer]: Exception occurred while checking podman accessibility: {ex.Message}");
             return false;
         }
-
-        proc.WaitForExit();
-        string stdout = proc.StandardOutput.ReadToEnd();
-        string stderr = proc.StandardError.ReadToEnd();
-        Debug.Log($"[podman-init]: {stdout + stderr}");
-        if (proc.ExitCode != 0)
-        {
-            Debug.Log($"[podman-init]: {stderr}");
-            return false;
-        }
-
-        return true;
     }
 }
