@@ -46317,7 +46317,7 @@ MonoBehaviour:
   m_text: 'it will install:
 
 
-    fastfetch, binbreak'
+    fastfetch, binbreak, cmatrix, greed, and more!'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5793593f3e4aa0840888838be0943b70, type: 2}
   m_sharedMaterial: {fileID: 2735156021978953860, guid: 5793593f3e4aa0840888838be0943b70, type: 2}

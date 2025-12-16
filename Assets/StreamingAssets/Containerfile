@@ -4,7 +4,7 @@ FROM debian:trixie-slim
 # * curl - allows to download non-apt programs
 # * sudo - to... sudo
 # * passwd - to set passwd for dev user
-RUN apt-get update && apt-get install curl sudo passwd -y
+RUN apt-get update && apt-get install curl sudo passwd fish perl -y
 
 # setup dev user
 RUN useradd -u 1000 -m -s /bin/bash dev
@@ -18,8 +18,8 @@ RUN curl -L -o /usr/local/bin/ttyd https://github.com/tsl0922/ttyd/releases/down
 RUN chmod +x /usr/local/bin/ttyd
 
 # setup path for dev and sudo
-ENV PATH="/home/dev/bin:$PATH"
-RUN echo 'Defaults secure_path="/home/dev/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' > /etc/sudoers.d/dev-path
+ENV PATH="/home/dev/bin:$PATH:/usr/games"
+RUN echo 'Defaults secure_path="/home/dev/bin:/usr/games:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' > /etc/sudoers.d/dev-path
 RUN chmod 440 /etc/sudoers.d/dev-path
 
 # create entrypoint_1 script to download custom-setup and exec ttyd on container start
@@ -27,7 +27,7 @@ RUN echo '#!/bin/bash' > /usr/local/bin/entrypoint_1.sh && \
     echo 'set -e' >> /usr/local/bin/entrypoint_1.sh && \
     echo 'curl -L -o /home/dev/bin/custom-setup "https://raw.githubusercontent.com/carrierpigeondev/argos-remote/refs/heads/main/custom-setup.sh"' >> /usr/local/bin/entrypoint_1.sh && \
     echo 'chmod +x /home/dev/bin/custom-setup' >> /usr/local/bin/entrypoint_1.sh && \
-    echo "exec ttyd -i 0.0.0.0 -u 1000 -t fontSize=32 -t 'theme={\"background\": \"black\"}' -W bash" >> /usr/local/bin/entrypoint_1.sh && \
+    echo "exec ttyd -i 0.0.0.0 -u 1000 -t fontSize=32 -t 'theme={\"background\": \"black\"}' -W fish" >> /usr/local/bin/entrypoint_1.sh && \
     chmod +x /usr/local/bin/entrypoint_1.sh
 
 EXPOSE 7681
