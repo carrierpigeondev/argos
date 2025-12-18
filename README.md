@@ -1,6 +1,10 @@
 # argos
 A.R.G.O.S.: Accessing Real Guest Operating Systems (in Unity)
 
+# important note
+
+If using the game released with the `custom-setup` script, the setup will prompt for a keyboard layout and encoding. Use `1` for both options :)
+
 # prerequisites
 
 This project already contains the necessary software for running the virtual environment (through Podman), **but requires virtualization to be enabled in your computer's UEFI BIOS** and **windows subsystem for linux (wsl2) windows feature to be enabled**
@@ -14,6 +18,11 @@ Please refer to Microsoft's guide for enabling virtualization in your computer's
 ## WSL2
 
 Please refer to Microsoft's guide for enabling WSL2 windows feature: https://learn.microsoft.com/en-us/windows/wsl/install
+
+# known issues
+
+1. On displays that are not 1080p (1920x1080), the raw image of screen in the screen view does not change resolution, so it may look blurry.
+2. Running into a wall or solid object stops movement entirely.
 
 # license
 
