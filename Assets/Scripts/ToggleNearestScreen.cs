@@ -12,6 +12,7 @@ public class ToggleNearestScreen : MonoBehaviour
     public FirstPersonController Fpc;
     public EventSystem EventSystem;
     public WebBrowserUIFull browserUIFull;
+    public GameObject StickyNoteUIObject;
 
     void Update()
     {
@@ -50,6 +51,8 @@ public class ToggleNearestScreen : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Fpc.cameraCanMove = false;
         Fpc.playerCanMove = false;
+
+        StickyNoteUIObject.SetActive(true);
     }
 
     private void HandleScreenDisable()
@@ -64,5 +67,7 @@ public class ToggleNearestScreen : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Fpc.cameraCanMove = true;
         Fpc.playerCanMove = true;
+
+        StickyNoteUIObject.SetActive(false);
     }
 }
